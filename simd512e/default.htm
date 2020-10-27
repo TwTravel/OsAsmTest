@@ -1,0 +1,4041 @@
+<!doctype html public "-//w3c//dtd xhtml 1.0 transitional//en" "http://www.w3.org/tr/xhtml1/dtd/xhtml1-transitional.dtd"><HTML>
+<!-- saved from url=(0050)https://www.officedaytime.com/simd512e/default.htm --><meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="en" http-equiv="Content-Language" />
+    <title>x86/x64 SIMD Instruction List (SSE to AVX512)</title>
+    <link rel="alternate" hreflang="ja" href="../simd512/default.htm" />
+    <link rel="alternate" hreflang="en" href="default.htm" />
+    <style type="text/css">
+        .red {
+            color: #FF0000;
+        }
+
+        h1 {
+            font-size: 15pt;
+            font-weight: bold;
+            background-color: #8288FD;
+            color: #FFFFFF;
+            padding: 2pt;
+        }
+
+        body {
+            font-family: sans-serif;
+            font-size: 10pt;
+        }
+
+        h2 {
+            font-weight: bold;
+            padding: 2pt 2pt 0pt 0pt;
+            font-size: 10pt;
+            border-bottom-style: solid;
+            border-bottom-width: 2px;
+            border-bottom-color: #0000FF;
+        }
+
+        h3 {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #0000FF;
+        }
+
+        dt {
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #FFFFFF;
+            font-size: 9pt;
+        }
+
+        table {
+            background-color: #C0C0C0;
+        }
+
+        th {
+            background-color: #E0E0E0;
+        }
+
+        .srcprogdiv {
+            border: 1px solid #0000FF;
+            border-radius: 5px;
+            padding: 5px 10px 5px 10px;
+        }
+
+        srcprogdiv {
+        }
+
+        .intr {
+            color: #6778ED;
+        }
+        .intr_S1 {
+            color: #6778ED;
+            background-color: inherit;
+        }
+        .intr_S2 {
+            color: #6778ED;
+            background-color: inherit;
+        }
+        .intr_S3 {
+            color: #6778ED;
+            background-color: inherit;
+        }
+        .intr_SS3 {
+            color: #6778ED;
+            background-color: inherit;
+        }
+        .intr_S41 {
+            color: #6778ED;
+            background-color: inherit;
+        }
+        .intr_S42 {
+            color: #6778ED;
+            background-color: inherit;
+        }
+        .intr_V1 {
+            color: #6778ED;
+            background-color: inherit;
+        }
+        .intr_V2 {
+            color: #6778ED;
+            background-color: inherit;
+        }
+        .intr_V5 {
+            color: #6778ED;
+            background-color: inherit;
+        }
+
+        .IL {
+            color: black;
+        }
+        .IL_S1 {
+            color: black;
+            background-color: inherit;
+        }
+        .IL_S2 {
+            color: black;
+            background-color: inherit;
+        }
+        .IL_S3 {
+            color: black;
+            background-color: inherit;
+        }
+        .IL_SS3 {
+            color: black;
+            background-color: inherit;
+        }
+        .IL_S41 {
+            color: black;
+            background-color: inherit;
+        }
+        .IL_S42 {
+            color: black;
+            background-color: inherit;
+        }
+        .IL_V1 {
+            color: black;
+            background-color: inherit;
+        }
+        .IL_V2 {
+            color: black;
+            background-color: inherit;
+        }
+        .IL_V5 {
+            color: black;
+            background-color: inherit;
+        }
+
+    </style>
+    <script type="text/javascript">
+
+
+var ac = ["", "S1", "S2", "S3", "SS3", "S41", "S42", "V1", "V2", "V5"];
+var acRules = [];
+var acRulesIntr = [];
+
+var markerFromInit = 0;
+var markerToInit = 0;
+var markerColorInit = 0;
+
+function onload() {
+    var stylesheets = document.styleSheets[0];
+    var arrayRules;
+    if (stylesheets.cssRules) {
+        arrayRules = stylesheets.cssRules;
+    }
+    else if (stylesheets.rules) {
+        arrayRules = stylesheets.rules;
+    }
+    if (arrayRules) {
+        for (var i = 0; i < arrayRules.length; i++) {
+            for (var j = 1; j < ac.length; j++) {
+                if (arrayRules[i].selectorText == ".IL_" + ac[j]) {
+                    acRules[j] = arrayRules[i];
+                }
+                else if (arrayRules[i].selectorText == ".intr_" + ac[j]) {
+                    acRulesIntr[j] = arrayRules[i];
+                }
+            }
+        }
+    }
+    if (location.search.length > 2) {
+        var params = location.search.substring(1).split('&');
+        for (var i = 0; i < params.length; i++) {
+            if (params[i].substring(0, 3) == "mf=") {
+                var markerfromelem = document.getElementById("markerfrom");
+                markerFromInit = params[i].substring(3) - 0;
+                markerfromelem.selectedIndex = markerFromInit;
+            }
+            else if (params[i].substring(0, 3) == "mt=") {
+                var markertoelem = document.getElementById("markerto");
+                markerToInit = params[i].substring(3) - 0;
+                markertoelem.selectedIndex = markerToInit;
+            }
+            else if (params[i].substring(0, 3) == "mc=") {
+                var markercolorelem = document.getElementById("markercolor");
+                markerColorInit = params[i].substring(3) - 0;
+                markercolorelem.selectedIndex = markerColorInit;
+            }
+        }
+    }
+
+
+    onmarker();
+}
+function onmarker() {
+    var markerfrom = document.getElementById("markerfrom").selectedIndex;
+    var markerto = document.getElementById("markerto").selectedIndex;
+
+    var markercolorelem = document.getElementById("markercolor");
+    var markercolor = markercolorelem.selectedIndex;
+
+    var colormarked = markercolorelem.options[markercolor].value;
+    if (markerfrom != 0 && markerto == 0) {
+        markerto = acRules.length - 1;
+    }
+
+    for (var i = 0; i < acRules.length; i++) {
+        if (acRules[i]) {
+            acRules[i].style.backgroundColor = (i >= markerfrom && i <= markerto) ? colormarked : "inherit";
+        }
+    }
+    for (var i = 0; i < acRulesIntr.length; i++) {
+        if (acRulesIntr[i]) {
+            acRulesIntr[i].style.backgroundColor = (i >= markerfrom && i <= markerto) ? colormarked : "inherit";
+        }
+    }
+
+    document.getElementById("markerpage").href = location.pathname + "?mf=" + markerfrom + "&mt=" + markerto + "&mc=" + markercolor;
+    document.getElementById("markerpagespan").style.visibility = (markerfrom == markerFromInit && markerto == markerToInit && markercolor == markerColorInit) ? "hidden" : "visible";
+
+
+}
+
+
+//document.addEventListener("DOMContentLoaded", onload);
+    </script>
+</head>
+
+<body onload="onload()">
+    <div id="topnotice"></div>
+    <script>
+        {
+            var dateNow = Date.now();
+            var dateMStart = new Date(Date.UTC(2020, 2-1, 19, 17, 0, 0));
+            var dateMEnd = new Date(Date.UTC(2020, 2-1, 19, 19, 30, 0));
+            if (dateNow < dateMEnd) {
+                var elemp = document.createElement("p");
+                elemp.style.color = "white";
+                elemp.style.backgroundColor = "red";
+
+                var msgtext = "This site may be unaccessible due to server maintenance from ";
+                msgtext += dateMStart.toLocaleString();
+                msgtext += " to ";
+                msgtext += dateMEnd.toLocaleString();
+                msgtext += " (in your local time).";
+                elemp.appendChild(document.createTextNode(msgtext));
+                document.getElementById("topnotice").appendChild(elemp);
+            }
+        }
+    </script>
+
+    <span style="font-weight:bold">English</span> <a href="../simd512/default.htm">Japanese</a>
+    <h1>x86/x64 SIMD Instruction List (SSE to AVX512)</h1>
+    <p>MMX register (64-bit) instructions are omitted.</p>
+    <p>
+        S1=SSE&nbsp; S2=SSE2 S3=SSE3 SS3=SSSE3 S4.1=SSE4.1 S4.2=SSE4.2 V1=AVX
+        V2=AVX2 V5=AVX512
+    </p>
+    <p>Instructions marked * become scalar instructions (only the lowest element is calculated) when PS/PD/DQ is changed to SS/SD/SI.</p>
+    <p>
+        C/C++ intrinsic name is written below each instruction in blue.
+    </p>
+    <p><strong>AVX/AVX2</strong></p>
+    <ul>
+        <li>Add prefix 'V' to change SSE instruction name to AVX instruction name.</li>
+        <li>FP AVX instructions can do 256-bit operations on YMM registers.</li>
+        <li>Integer AVX instructions can use YMM registers from AVX2.</li>
+        <li>To use 256-bit intrinsics, change prefix _mm to _mm256, and suffix si128 to si256.</li>
+        <li>Using YMM registers requires the support from OS (For Windows, 7 update 1 or later is required).</li>
+        <li>
+            YMM register is basically separated into 2 lanes (upper 128-bit and lower 128-bit) and operates within each lane.  Horizontal operations (unpacks, shuffles,
+            horizontal calculations, byte shifts, conversions) can be anomalous.  Check the manuals out carefully.
+        </li>
+    </ul>
+    <p><strong>AVX512</strong></p>
+    <ul>
+        <li>Instructions noted only "(V5" can be used if CPUID AVX512F flag is on.</li>
+        <li>Instructions noted "(V5" and "+xx" can be used only if CPUID AVX512F flag is set and AVX512xx flag is also set.</li>
+        <li>Using AVX512 instructions requires the support from OS.</li>
+        <li>The features common to most AVX512 instructions ({k1}{z}, {er}/{sae}, bcst) are not mentioned in each instruction. See this -&gt; <a href="simdimg/avx512memo.html" target="_blank">AVX512 Memo</a></li>
+        <li>Opmask register instructions are <a href="simdimg/opmaskinst.html" target="_blank">here</a>.</li>
+    </ul>
+    <p>This document is intended that you can find the correct instruction name that you are not sure of, and make it possible to search in the manuals.  Refer to the manuals before coding.</p>
+    <p>
+        Intel's manuals -&gt; <a href="../../https@software.intel.com/en-us/articles/intel-sdm">https://software.intel.com/en-us/articles/intel-sdm</a>
+    </p>
+    <p>
+        When you find any error or something please post <a href="../tips/simdfeedback/feedbackforme.php@src=simd.html" target="_blank">this feedback form</a> or email me to the address at the bottom of this page.
+    </p>
+    <p>&nbsp;</p>
+    <p>
+        Highlighter&nbsp;
+        <select id="markerfrom" onchange="onmarker();">
+            <option>&nbsp;</option>
+            <option>SSE</option>
+            <option>SSE2</option>
+            <option>SSE3</option>
+            <option>SSSE3</option>
+            <option>SSE4.1</option>
+            <option>SSE4.2</option>
+            <option>AVX</option>
+            <option>AVX2</option>
+            <option>AVX512</option>
+        </select>
+        to
+        <select id="markerto" onchange="onmarker();">
+            <option>&nbsp;</option>
+            <option>SSE</option>
+            <option>SSE2</option>
+            <option>SSE3</option>
+            <option>SSSE3</option>
+            <option>SSE4.1</option>
+            <option>SSE4.2</option>
+            <option>AVX</option>
+            <option>AVX2</option>
+            <option>AVX512</option>
+        </select>
+        &nbsp;
+        Color
+        &nbsp;
+        <select id="markercolor" onchange="onmarker();">
+            <option value="#C0FFA0">green</option>
+            <option value="#FFFF80">yellow</option>
+            <option value="#FFE0FF">pink</option>
+            <option value="#FFE0C0">orange</option>
+        </select>
+
+        &nbsp;<span id="markerpagespan">To make these default, bookmark this page after clicking <a id="markerpage">here</a>.</span>
+    </p>
+    <h2>MOVE <span style="font-weight:100">&nbsp;&nbsp;&nbsp;&nbsp;?MM = XMM / YMM / ZMM</span></h2>
+    <table>
+        <tr>
+            <th rowspan="2">&nbsp;</th>
+            <th colspan="4">Integer</th>
+            <th colspan="3">Floating-Point</th>
+            <th rowspan="2">YMM lane (128-bit)</th>
+        </tr>
+        <tr>
+            <th>QWORD</th>
+            <th>DWORD</th>
+            <th>WORD</th>
+            <th>BYTE</th>
+            <th>Double</th>
+            <th>Single</th>
+            <th>Half</th>
+        </tr>
+        <tr>
+            <th rowspan="2">
+                ?MM whole<br />
+                <img src="simdimg/fromto.png" alt="from / to" /><br />
+                ?MM/mem
+            </th>
+            <td colspan="4">
+                <a href="simdimg/si.php@f=movdqa.htm" target="_blank" class="IL_S2">MOVDQA</a> (S2<br />
+                <span class="intr">
+                    _mm_load_si128<br />
+                    _mm_store_si128<br />
+                </span>
+                <a href="simdimg/si.php@f=movdqa.htm" target="_blank" class="IL_S2">MOVDQU</a> (S2<br />
+                <span class="intr">
+                    _mm_loadu_si128 <br />
+                    _mm_storeu_si128
+                </span>
+            </td>
+            <td rowspan="2">
+                <a href="simdimg/si.php@f=movapd.htm" target="_blank" class="IL_S2">MOVAPD</a> (S2<br />
+                <span class="intr">
+                    _mm_load_pd<br />
+                    _mm_loadr_pd <br />
+                    _mm_store_pd <br />
+                    _mm_storer_pd
+                </span><br />
+                <a href="simdimg/si.php@f=movapd.htm" target="_blank" class="IL_S2">MOVUPD</a> (S2<br />
+                <span class="intr">
+                    _mm_loadu_pd <br />
+                    _mm_storeu_pd
+                </span>
+            </td>
+            <td rowspan="2">
+                <a href="simdimg/si.php@f=movaps.htm" target="_blank" class="IL_S1">MOVAPS</a> (S1<br />
+                <span class="intr">
+                    _mm_load_ps <br />
+                    _mm_loadr_ps<br />
+                    _mm_store_ps <br />
+                    _mm_storer_ps
+                </span><br />
+                <a href="simdimg/si.php@f=movaps.htm" target="_blank" class="IL_S1">MOVUPS</a> (S1<br />
+                <span class="intr">
+                    _mm_loadu_ps<br />
+                    _mm_storeu_ps
+                </span>
+            </td>
+            <td rowspan="2"></td>
+            <td rowspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/vmovdqa.php@f=vmovdqa64.htm" target="_blank" class="IL_V5">VMOVDQA64</a> (V5...<br />
+                <span class="intr">_mm_mask_load_epi64<br />_mm_mask_store_epi64<br />etc<br /></span>
+                <a href="simdimg/vmovdqa.php@f=vmovdqa64.htm" target="_blank" class="IL_V5">VMOVDQU64</a> (V5...<br />
+                <span class="intr">_mm_mask_loadu_epi64<br />_mm_mask_store_epi64<br />etc<br /></span>
+            </td>
+            <td>
+                <a href="simdimg/vmovdqa.php@f=vmovdqa32.htm" target="_blank" class="IL_V5">VMOVDQA32</a> (V5...<br />
+                <span class="intr">_mm_mask_load_epi32<br />_mm_mask_store_epi32<br />etc<br /></span>
+                <a href="simdimg/vmovdqa.php@f=vmovdqa32.htm" target="_blank" class="IL_V5">VMOVDQU32</a> (V5...<br />
+                <span class="intr">_mm_mask_loadu_epi32<br />_mm_mask_storeu_epi32<br />etc<br /></span>
+            </td>
+            <td>
+                <a href="simdimg/vmovdqa.php@f=vmovdqu16.htm" target="_blank" class="IL_V5">VMOVDQU16</a> (V5+BW...<br />
+                <span class="intr">_mm_mask_loadu_epi16<br />_mm_mask_storeu_epi16<br />etc<br /></span>
+            </td>
+            <td>
+                <a href="simdimg/vmovdqa.php@f=vmovdqu8.htm" target="_blank" class="IL_V5">VMOVDQU8</a> (V5+BW...<br />
+                <span class="intr">_mm_mask_loadu_epi8<br />_mm_mask_storeu_epi8<br />etc<br /></span>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                XMM upper half<br />
+                <img src="simdimg/fromto.png" alt="from / to" /><br />
+                mem
+            </th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/si.php@f=movhpd.htm" target="_blank" class="IL_S2">MOVHPD</a> (S2<br />
+                <span class="intr">
+                    _mm_loadh_pd<br />
+                    _mm_storeh_pd
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=movhps.htm" target="_blank" class="IL_S1">MOVHPS</a> (S1<br />
+                <span class="intr">
+                    _mm_loadh_pi<br />
+                    _mm_storeh_pi
+                </span>
+            </td>
+            <td></td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>
+                XMM upper half<br />
+                <img src="simdimg/fromto.png" alt="from / to" /><br />
+                XMM lower half
+            </th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/si.php@f=movhlps.htm" target="_blank" class="IL_S1">MOVHLPS</a> (S1<br />
+                <span class="intr">_mm_movehl_ps</span><br />
+                <a href="simdimg/si.php@f=movlhps.htm" target="_blank" class="IL_S1">MOVLHPS</a> (S1<span class="intr">
+                    <br />
+                    _mm_movelh_ps
+                </span>
+            </td>
+            <td></td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>
+                XMM lower half<br />
+                <img src="simdimg/fromto.png" alt="from / to" /><br />
+                mem
+            </th>
+            <td>
+                <a href="simdimg/si.php@f=movq.htm" target="_blank" class="IL_S2">MOVQ</a> (S2<br />
+                <span class="intr">
+                    _mm_loadl_epi64<br />
+                    _mm_storel_epi64
+                </span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=movlpd.htm" target="_blank" class="IL_S2">MOVLPD</a> (S2<br />
+                <span class="intr">
+                    _mm_loadl_pd<br />
+                    _mm_storel_pd
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=movlps.htm" target="_blank" class="IL_S1">MOVLPS</a> (S1<br />
+                <span class="intr">
+                    _mm_loadl_pi<br />
+                    _mm_storel_pi
+                </span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>
+                XMM lowest 1 elem<br />
+                <img src="simdimg/fromto.png" alt="from / to" /><br />
+                r/m
+            </th>
+            <td>
+                <a href="simdimg/si.php@f=movq.htm" target="_blank" class="IL_S2">MOVQ</a> (S2<br />
+                <span class="intr">
+                    _mm_cvtsi64_si128<br />
+                    _mm_cvtsi128_si64
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=movd.htm" target="_blank" class="IL_S2">MOVD</a> (S2<br />
+                <span class="intr">
+                    _mm_cvtsi32_si128<br />
+                    _mm_cvtsi128_si32
+                </span>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>&nbsp;</td>
+            <td></td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>
+                XMM lowest 1 elem<br />
+                <img src="simdimg/fromto.png" alt="from / to" /><br />
+                XMM/mem
+            </th>
+            <td>
+                <a href="simdimg/si.php@f=movq.htm" target="_blank" class="IL_S2">MOVQ</a> (S2<br />
+                <span class="intr">_mm_move_epi64</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=movsd.htm" target="_blank" class="IL_S2">MOVSD</a> (S2<br />
+                <span class="intr">
+                    _mm_load_sd<br />
+                    _mm_store_sd<br />
+                    _mm_move_sd
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=movss.htm" target="_blank" class="IL_S1">MOVSS</a> (S1<br />
+                <span class="intr">
+                    _mm_load_ss<br />
+                    _mm_store_ss<br />
+                    _mm_move_ss
+                </span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>
+                XMM whole<br />
+                <img src="simdimg/from.png" alt="from" /><br />
+                1 elem<br />
+            </th>
+            <td>
+                <a href="#tip2" target="_blank" class="IL_S2">TIP 2</a><br />
+                <span class="intr_S2">_mm_set1_epi64x</span><br />
+                <a href="simdimg/vpbroadcast.php@f=vpbroadcastq.htm" target="_blank" class="IL_V2">VPBROADCASTQ</a> (V2<br />
+                <span class="intr">_mm_broadcastq_epi64</span>
+            </td>
+            <td>
+                <a href="#tip2" target="_blank" class="IL_S2">TIP 2</a><br />
+                <span class="intr_S2">_mm_set1_epi32</span><br />
+                <a href="simdimg/vpbroadcast.php@f=vpbroadcastd.htm" target="_blank" class="IL_V2">VPBROADCASTD</a> (V2<br />
+                <span class="intr">_mm_broadcastd_epi32</span>
+            </td>
+            <td>
+                <a href="#tip2" target="_blank" class="IL_S2">TIP 2</a><br />
+                <span class="intr_S2">_mm_set1_epi16</span><br />
+                <a href="simdimg/vpbroadcast.php@f=vpbroadcastw.htm" target="_blank" class="IL_V2">VPBROADCASTW</a> (V2<br />
+                <span class="intr">_mm_broadcastw_epi16</span>
+            </td>
+            <td>
+                <span class="intr_S2">_mm_set1_epi8</span><br />
+                <a href="simdimg/vpbroadcast.php@f=vpbroadcastb.htm" target="_blank" class="IL_V2">VPBROADCASTB</a> (V2<br />
+                <span class="intr">_mm_broadcastb_epi8</span>
+            </td>
+            <td>
+                <a href="#tip2" target="_blank" class="IL_S2">TIP 2</a><br />
+                <span class="intr_S2">
+                    _mm_set1_pd<br />
+                    _mm_load1_pd<br />
+                </span><a href="simdimg/si.php@f=movddup.htm" target="_blank" class="IL_S3">MOVDDUP</a> (S3<br />
+                <span class="intr">
+                    _mm_movedup_pd<br />
+                    _mm_loaddup_pd
+                </span><br />
+            </td>
+            <td>
+                <a href="#tip2" target="_blank" class="IL_S1">TIP 2</a>
+                <span class="intr_S1">
+                    <br />
+                    _mm_set1_ps<br />
+                    _mm_load1_ps
+                </span><br />
+                <a href="simdimg/si.php@f=vbroadcastss.htm" target="_blank" class="IL_V1">VBROADCASTSS</a> <br />
+                from mem (V1<br />
+                from XMM (V2<br />
+                <span class="intr">_mm_broadcast_ss</span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>
+                YMM / ZMM whole<br />
+                <img src="simdimg/from.png" alt="from" /><br />
+                1 elem
+            </th>
+            <td>
+                <a href="simdimg/vpbroadcast.php@f=vpbroadcastq.htm" target="_blank" class="IL_V2">VPBROADCASTQ</a> (V2<br />
+                <span class="intr">_mm256_broadcastq_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/vpbroadcast.php@f=vpbroadcastd.htm" target="_blank" class="IL_V2">VPBROADCASTD</a> (V2<br />
+                <span class="intr">_mm256_broadcastd_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/vpbroadcast.php@f=vpbroadcastw.htm" target="_blank" class="IL_V2">VPBROADCASTW</a> (V2<br />
+                <span class="intr">_mm256_broadcastw_epi16</span>
+            </td>
+            <td>
+                <a href="simdimg/vpbroadcast.php@f=vpbroadcastb.htm" target="_blank" class="IL_V2">VPBROADCASTB</a> (V2<br />
+                <span class="intr">_mm256_broadcastb_epi8</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vbroadcastsd.htm" target="_blank" class="IL_V1">VBROADCASTSD</a> <br />
+                &nbsp;from mem (V1<br />
+                &nbsp;from XMM (V2<br />
+                <span class="intr">_mm256_broadcast_sd</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vbroadcastss.htm" target="_blank" class="IL_V1">VBROADCASTSS</a> <br />
+                &nbsp;from mem (V1<br />
+                &nbsp;from XMM (V2<br />
+                <span class="intr">_mm256_broadcast_ss</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=vbroadcastf128.htm" target="_blank" class="IL_V1">VBROADCASTF128</a> (V1<br />
+                <span class="intr">
+                    _mm256_broadcast_ps<br />
+                    _mm256_broadcast_pd
+                </span><br />
+                <a href="simdimg/si.php@f=vbroadcastf128.htm" target="_blank" class="IL_V2">VBROADCASTI128</a> (V2<br />
+                <span class="intr">_mm256_broadcastsi128_si256</span>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                YMM / ZMM whole<br />
+                <img src="simdimg/from.png" alt="from" /><br />
+                2/4/8 elems
+            </th>
+            <td>
+                <a href="simdimg/si.php@f=vbroadcastf64x2.htm" target="_blank" class="IL_V5">VBROADCASTI64X2</a> (V5+DQ...<br />
+                <span class="intr">_mm512_broadcast_i64x2</span><br />
+                <a href="simdimg/si.php@f=vbroadcastf64x4.htm" target="_blank" class="IL_V5">VBROADCASTI64X4</a> (V5<br />
+                <span class="intr">_mm512_broadcast_i64x4</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vbroadcastf32x2.htm" target="_blank" class="IL_V5">VBROADCASTI32X2</a> (V5+DQ...<br />
+                <span class="intr">_mm512_broadcast_i32x2</span><br />
+                <a href="simdimg/si.php@f=vbroadcastf32x4.htm" target="_blank" class="IL_V5">VBROADCASTI32X4</a> (V5...<br />
+                <span class="intr">_mm512_broadcast_i32x4</span><br />
+                <a href="simdimg/si.php@f=vbroadcastf32x8.htm" target="_blank" class="IL_V5">VBROADCASTI32X8</a> (V5+DQ<br />
+                <span class="intr">_mm512_broadcast_i32x8</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/si.php@f=vbroadcastf64x2.htm" target="_blank" class="IL_V5">VBROADCASTF64X2</a> (V5+DQ...<br />
+                <span class="intr">_mm512_broadcast_f64x2</span><br />
+                <a href="simdimg/si.php@f=vbroadcastf64x4.htm" target="_blank" class="IL_V5">VBROADCASTF64X4</a> (V5<br />
+                <span class="intr">_mm512_broadcast_f64x4</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vbroadcastf32x2.htm" target="_blank" class="IL_V5">VBROADCASTF32X2</a> (V5+DQ...<br />
+                <span class="intr">_mm512_broadcast_f32x2</span><br />
+                <a href="simdimg/si.php@f=vbroadcastf32x4.htm" target="_blank" class="IL_V5">VBROADCASTF32X4</a> (V5...<br />
+                <span class="intr">_mm512_broadcast_f32x4</span><br />
+                <a href="simdimg/si.php@f=vbroadcastf32x8.htm" target="_blank" class="IL_V5">VBROADCASTF32X8</a> (V5+DQ<br />
+                <span class="intr">_mm512_broadcast_f32x8</span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+
+
+        <tr>
+            <th>
+                ?MM<br />
+                <img src="simdimg/from.png" alt="from" /><br />
+                multiple elems
+            </th>
+            <td>
+                <span class="intr_S2">
+                    _mm_set_epi64x<br />
+                    _mm_setr_epi64x
+                </span>
+            </td>
+            <td>
+                <span class="intr_S2">
+                    _mm_set_epi32<br />
+                    _mm_setr_epi32
+                </span>
+            </td>
+            <td>
+                <span class="intr_S2">
+                    _mm_set_epi16<br />
+                    _mm_setr_epi16
+                </span>
+            </td>
+            <td>
+                <span class="intr_S2">
+                    _mm_set_epi8<br />
+                    _mm_setr_epi8
+                </span>
+            </td>
+            <td>
+                <span class="intr_S2">
+                    _mm_set_pd<br />
+                    _mm_setr_pd
+                </span>
+            </td>
+            <td>
+                <span class="intr_S1">
+                    _mm_set_ps<br />
+                    _mm_setr_ps
+                </span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>
+                ?MM whole<br />
+                <img src="simdimg/from.png" alt="from" /><br />
+                zero
+            </th>
+            <td colspan="4">
+                <a href="#tip1" target="_blank" class="IL_S2">TIP 1</a><br />
+                <span class="intr_S2">_mm_setzero_si128</span>
+            </td>
+            <td>
+                <a href="#tip1" target="_blank" class="IL_S2">TIP 1</a><br />
+                <span class="intr_S2">_mm_setzero_pd</span>
+            </td>
+            <td>
+                <a href="#tip1" target="_blank" class="IL_S1">TIP 1</a><br />
+                <span class="intr_S1">_mm_setzero_ps</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+
+
+        </tr>
+        <tr>
+            <th rowspan="2">extract</th>
+            <td>
+                <a href="simdimg/si.php@f=pextrq.htm" target="_blank" class="IL_S41">PEXTRQ</a> (S4.1<br />
+                <span class="intr">_mm_extract_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pextrd.htm" target="_blank" class="IL_S41">PEXTRD</a> (S4.1<br />
+                <span class="intr">_mm_extract_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pextrw.htm" target="_blank" class="IL_S2">PEXTRW</a> to r (S2<br />
+                <a href="simdimg/si.php@f=pextrw.htm" target="_blank" class="IL_S41">PEXTRW</a> to r/m (S4.1<br />
+                <span class="intr">_mm_extract_epi16</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pextrb.htm" target="_blank" class="IL_S41">PEXTRB</a> (S4.1<br />
+                <span class="intr">_mm_extract_epi8</span>
+            </td>
+            <td>
+                -><a href="simdimg/si.php@f=movhpd.htm" target="_blank" class="IL_S2">MOVHPD</a> (S2<br />
+                <span class="intr">
+                    _mm_loadh_pd<br />
+                    _mm_storeh_pd
+                </span><br />
+                -><a href="simdimg/si.php@f=movlpd.htm" target="_blank" class="IL_S2">MOVLPD</a> (S2<br />
+                <span class="intr">
+                    _mm_loadl_pd<br />
+                    _mm_storel_pd
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=extractps.htm" target="_blank" class="IL_S41">EXTRACTPS</a> (S4.1<br />
+                <span class="intr">_mm_extract_ps</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=vextractf128.htm" target="_blank" class="IL_V1">VEXTRACTF128</a> (V1<br />
+                <span class="intr">
+                    _mm256_extractf128_ps<br />
+                    _mm256_extractf128_pd<br />
+                    _mm256_extractf128_si256
+                </span><br />
+                <a href="simdimg/si.php@f=vextractf128.htm" target="_blank" class="IL_V2">VEXTRACTI128</a> (V2<br />
+                <span class="intr">_mm256_extracti128_si256</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/si.php@f=vextractf64x2.htm" target="_blank" class="IL_V5">VEXTRACTI64X2</a> (V5+DQ...<br />
+                <span class="intr">_mm512_extracti64x2_epi64</span><br />
+                <a href="simdimg/si.php@f=vextractf64x4.htm" target="_blank" class="IL_V5">VEXTRACTI64X4</a> (V5<br />
+                <span class="intr">_mm512_extracti64x4_epi64</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vextractf32x4.htm" target="_blank" class="IL_V5">VEXTRACTI32X4</a> (V5...<br />
+                <span class="intr">_mm512_extracti32x4_epi32</span><br />
+                <a href="simdimg/si.php@f=vextractf32x8.htm" target="_blank" class="IL_V5">VEXTRACTI32X8</a> (V5+DQ<br />
+                <span class="intr">_mm512_extracti32x8_epi32</span><br />
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/si.php@f=vextractf64x2.htm" target="_blank" class="IL_V5">VEXTRACTF64X2</a> (V5+DQ...<br />
+                <span class="intr">_mm512_extractf64x2_pd</span><br />
+                <a href="simdimg/si.php@f=vextractf64x4.htm" target="_blank" class="IL_V5">VEXTRACTF64X4</a> (V5<br />
+                <span class="intr">_mm512_extractf64x4_pd</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vextractf32x4.htm" target="_blank" class="IL_V5">VEXTRACTF32X4</a> (V5...<br />
+                <span class="intr">_mm512_extractf32x4_ps</span><br />
+                <a href="simdimg/si.php@f=vextractf32x8.htm" target="_blank" class="IL_V5">VEXTRACTF32X8</a> (V5+DQ<br />
+                <span class="intr">_mm512_extractf32x8_ps</span><br />
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+
+        <tr>
+            <th rowspan="2">insert</th>
+            <td>
+                <a href="simdimg/si.php@f=pinsrq.htm" target="_blank" class="IL_S41">PINSRQ</a> (S4.1<br />
+                <span class="intr">_mm_insert_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pinsrd.htm" target="_blank" class="IL_S41">PINSRD</a> (S4.1<br />
+                <span class="intr">_mm_insert_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pinsrw.htm" target="_blank" class="IL_S2">PINSRW</a> (S2<br />
+                <span class="intr">_mm_insert_epi16</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pinsrb.htm" target="_blank" class="IL_S41">PINSRB</a> (S4.1<br />
+                <span class="intr">_mm_insert_epi8</span>
+            </td>
+            <td>
+                -><a href="simdimg/si.php@f=movhpd.htm" target="_blank" class="IL_S2">MOVHPD</a> (S2<br />
+                <span class="intr">
+                    _mm_loadh_pd<br />
+                    _mm_storeh_pd
+                </span><br />
+                -><a href="simdimg/si.php@f=movlpd.htm" target="_blank" class="IL_S2">MOVLPD</a> (S2<br />
+                <span class="intr">
+                    _mm_loadl_pd<br />
+                    _mm_storel_pd
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=insertps.htm" target="_blank" class="IL_S41">INSERTPS</a> (S4.1<br />
+                <span class="intr">_mm_insert_ps</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=vinsertf128.htm" target="_blank" class="IL_V1">VINSERTF128</a> (V1<br />
+                <span class="intr">
+                    _mm256_insertf128_ps<br />
+                    _mm256_insertf128_pd<br />
+                    _mm256_insertf128_si256
+                </span><br />
+                <a href="simdimg/si.php@f=vinsertf128.htm" target="_blank" class="IL_V2">VINSERTI128</a> (V2<br />
+                <span class="intr">_mm256_inserti128_si256</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/si.php@f=vinsertf64x2.htm" target="_blank" class="IL_V5">VINSERTI64X2</a> (V5+DQ...<br />
+                <span class="intr">_mm512_inserrti64x2</span><br />
+                <a href="simdimg/si.php@f=vinsertf64x4.htm" target="_blank" class="IL_V5">VINSERTI64X4</a> (V5...<br />
+                <span class="intr">_mm512_inserti64x4</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vinsertf32x4.htm" target="_blank" class="IL_V5">VINSERTI32X4</a> (V5...<br />
+                <span class="intr">_mm512_inserti32x4</span><br />
+                <a href="simdimg/si.php@f=vinsertf32x8.htm" target="_blank" class="IL_V5">VINSERTI32X8</a> (V5+DQ<br />
+                <span class="intr">_mm512_inserti32x8</span><br />
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/si.php@f=vinsertf64x2.htm" target="_blank" class="IL_V5">VINSERTF64X2</a> (V5+DQ...<br />
+                <span class="intr">_mm512_insertf64x2</span><br />
+                <a href="simdimg/si.php@f=vinsertf64x4.htm" target="_blank" class="IL_V5">VINSERTF64X4</a> (V5<br />
+                <span class="intr">_mm512_insertf64x4</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vinsertf32x4.htm" target="_blank" class="IL_V5">VINSERTF32X4</a> (V5...<br />
+                <span class="intr">_mm512_insertf32x4</span><br />
+                <a href="simdimg/si.php@f=vinsertf32x8.htm" target="_blank" class="IL_V5">VINSERTF32X8</a> (V5+DQ<br />
+                <span class="intr">_mm512_insertf32x8</span><br />
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <th>unpack<br /><img src="simdimg/unpack.png" /></th>
+            <td>
+                <a href="simdimg/unpack.php@f=punpckhqdq.htm" target="_blank" class="IL_S2">PUNPCKHQDQ</a> (S2<br />
+                <span class="intr">
+                    _mm_unpackhi_epi64<br />
+                </span><a href="simdimg/unpack.php@f=punpcklqdq.htm" target="_blank" class="IL_S2">PUNPCKLQDQ</a> (S2<br />
+                <span class="intr">_mm_unpacklo_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/unpack.php@f=punpckhdq.htm" target="_blank" class="IL_S2">PUNPCKHDQ</a> (S2<br />
+                <span class="intr">_mm_unpackhi_epi32</span><br />
+                <a href="simdimg/unpack.php@f=punpckldq.htm" target="_blank" class="IL_S2">PUNPCKLDQ</a> (S2<br />
+                <span class="intr">_mm_unpacklo_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/unpack.php@f=punpckhwd.htm" target="_blank" class="IL_S2">PUNPCKHWD</a> (S2<br />
+                <span class="intr">_mm_unpackhi_epi16</span><br />
+                <a href="simdimg/unpack.php@f=punpcklwd.htm" target="_blank" class="IL_S2">PUNPCKLWD</a> (S2<br />
+                <span class="intr">_mm_unpacklo_epi16</span>
+            </td>
+            <td>
+                <a href="simdimg/unpack.php@f=punpckhbw.htm" target="_blank" class="IL_S2">PUNPCKHBW</a> (S2<br />
+                <span class="intr">_mm_unpackhi_epi8</span><br />
+                <a href="simdimg/unpack.php@f=punpcklbw.htm" target="_blank" class="IL_S2">PUNPCKLBW</a> (S2<br />
+                <span class="intr">_mm_unpacklo_epi8</span>
+            </td>
+
+            <td>
+                <a href="simdimg/unpack.php@f=unpckhpd.htm" target="_blank" class="IL_S2">UNPCKHPD</a> (S2<br />
+                <span class="intr">_mm_unpackhi_pd</span><br />
+                <a href="simdimg/unpack.php@f=unpcklpd.htm" target="_blank" class="IL_S2">UNPCKLPD</a> (S2<br />
+                <span class="intr">_mm_unpacklo_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/unpack.php@f=unpckhps.htm" target="_blank" class="IL_S1">UNPCKHPS</a> (S1<br />
+                <span class="intr">_mm_unpackhi_ps</span><br />
+                <a href="simdimg/unpack.php@f=unpcklps.htm" target="_blank" class="IL_S1">UNPCKLPS</a> (S1<br />
+                <span class="intr">_mm_unpacklo_ps</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th rowspan="2">
+                shuffle/permute<br />
+                <img src="simdimg/shuffle.png" />
+            </th>
+            <td>
+                <a href="simdimg/si.php@f=vpermq.htm" target="_blank" class="IL_V2">VPERMQ</a> (V2<br />
+                <span class="intr">_mm256_permute4x64_epi64</span><br />
+                <a href="simdimg/si.php@f=vpermi2q.htm" target="_blank" class="IL_V5">VPERMI2Q</a> (V5...<br />
+                <span class="intr">_mm_permutex2var_epi64</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pshufd.htm" target="_blank" class="IL_S2">PSHUFD</a> (S2<br />
+                <span class="intr">_mm_shuffle_epi32</span><br />
+                <a href="simdimg/si.php@f=vpermd.htm" target="_blank" class="IL_V2">VPERMD</a> (V2<br />
+                <span class="intr">_mm256_permutevar8x32_epi32</span><br />
+                <span class="intr">_mm256_permutexvar_epi32</span><br />
+                <a href="simdimg/si.php@f=vpermi2d.htm" target="_blank" class="IL_V5">VPERMI2D</a> (V5...<br />
+                <span class="intr">_mm_permutex2var_epi32</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pshufhw.htm" target="_blank" class="IL_S2">PSHUFHW</a> (S2<br />
+                <span class="intr">_mm_shufflehi_epi16</span><br />
+                <a href="simdimg/si.php@f=pshuflw.htm" target="_blank" class="IL_S2">PSHUFLW</a> (S2<br />
+                <span class="intr">_mm_shufflelo_epi16</span><br />
+                <a href="simdimg/si.php@f=vpermw.htm" target="_blank" class="IL_V5">VPERMW</a> (V5+BW...<br />
+                <span class="intr">_mm_permutexvar_epi16</span><br />
+                <a href="simdimg/si.php@f=vpermi2w.htm" target="_blank" class="IL_V5">VPERMI2W</a> (V5+BW...<br />
+                <span class="intr">_mm_permutex2var_epi16</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pshufb.htm" target="_blank" class="IL_SS3">PSHUFB</a> (SS3<br />
+                <span class="intr">_mm_shuffle_epi8</span>
+            </td>
+
+            <td>
+                <a href="simdimg/si.php@f=shufpd.htm" target="_blank" class="IL_S2">SHUFPD</a> (S2<br />
+                <span class="intr">_mm_shuffle_pd</span><br />
+                <a href="simdimg/si.php@f=vpermilpd.htm" target="_blank" class="IL_V1">VPERMILPD</a> (V1<br />
+                <span class="intr">
+                    _mm_permute_pd<br />
+                    _mm_permutevar_pd
+                </span><br />
+                <a href="simdimg/si.php@f=vpermq.htm" target="_blank" class="IL_V2">VPERMPD</a> (V2<br />
+                <span class="intr">_mm256_permute4x64_pd</span><br />
+                <a href="simdimg/si.php@f=vpermi2q.htm" target="_blank" class="IL_V5">VPERMI2PD</a> (V5...<br />
+                <span class="intr">_mm_permutex2var_pd</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=shufps.htm" target="_blank" class="IL_S1">SHUFPS</a> (S1<br />
+                <span class="intr">_mm_shuffle_ps</span><br />
+                <a href="simdimg/si.php@f=vpermilps.htm" target="_blank" class="IL_V1">VPERMILPS</a> (V1<br />
+                <span class="intr">
+                    _mm_permute_ps<br />
+                    _mm_permutevar_ps
+                </span><br />
+                <a href="simdimg/si.php@f=vpermd.htm" target="_blank" class="IL_V2">VPERMPS</a> (V2<br />
+                <span class="intr">_mm256_permutevar8x32_ps</span><br />
+                <a href="simdimg/si.php@f=vpermi2d.htm" target="_blank" class="IL_V5">VPERMI2PS</a> (V5...<br />
+                <span class="intr">_mm_permutex2var_ps</span><br />
+            </td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=vperm2f128.htm" target="_blank" class="IL_V1">VPERM2F128</a> (V1<br />
+                <span class="intr">
+                    _mm256_permute2f128_ps<br />
+                    _mm256_permute2f128_pd<br />
+                    _mm256_permute2f128_si256
+                </span><br />
+                <a href="simdimg/si.php@f=vperm2f128.htm" target="_blank" class="IL_V2">VPERM2I128</a> (V2<br />
+                <span class="intr">_mm256_permute2x128_si256</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/si.php@f=vshufi64x2.htm" target="_blank" class="IL_V5">VSHUFI64X2</a> (V5...<br />
+                <span class="intr">_mm512_shuffle_i64x2</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vshufi32x4.htm" target="_blank" class="IL_V5">VSHUFI32X4</a> (V5...<br />
+                <span class="intr">_mm512_shuffle_i32x4</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/si.php@f=vshufi64x2.htm" target="_blank" class="IL_V5">VSHUFF64X2</a> (V5...<br />
+                <span class="intr">_mm512_shuffle_f64x2</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vshufi32x4.htm" target="_blank" class="IL_V5">VSHUFF32X4</a> (V5...<br />
+                <span class="intr">_mm512_shuffle_f32x4</span>
+            </td>
+            <td></td>
+            <td></td>
+
+        </tr>
+
+        <tr>
+            <th>
+                blend<br />
+                <img src="simdimg/blend.png" />
+            </th>
+            <td>
+                <a href="simdimg/si.php@f=vpblendmq.htm" target="_blank" class="IL_V5">VPBLENDMQ</a> (V5...<br />
+                <span class="intr">_mm_mask_blend_epi32</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vpblendd.htm" target="_blank" class="IL_V2">VPBLENDD</a> (V2<br />
+                <span class="intr">_mm_blend_epi32</span><br />
+                <a href="simdimg/si.php@f=vpblendmd.htm" target="_blank" class="IL_V5">VPBLENDMD</a> (V5...<br />
+                <span class="intr">_mm_mask_blend_epi32</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pblendw.htm" target="_blank" class="IL_S41">PBLENDW</a> (S4.1<br />
+                <span class="intr">_mm_blend_epi16</span><br />
+                <a href="simdimg/si.php@f=vpblendmw.htm" target="_blank" class="IL_V5">VPBLENDMW</a> (V5+BW...<br />
+                <span class="intr">_mm_mask_blend_epi16</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pblendvb.htm" target="_blank" class="IL_S41">PBLENDVB</a> (S4.1<br />
+                <span class="intr">_mm_blendv_epi8</span><br />
+                <a href="simdimg/si.php@f=vpblendmb.htm" target="_blank" class="IL_V5">VPBLENDMB</a> (V5+BW...<br />
+                <span class="intr">_mm_mask_blend_epi8</span><br />
+            </td>
+
+            <td>
+                <a href="simdimg/si.php@f=blendpd.htm" target="_blank" class="IL_S41">BLENDPD</a> (S4.1<br />
+                <span class="intr">_mm_blend_pd</span><br />
+                <a href="simdimg/si.php@f=blendvpd.htm" target="_blank" class="IL_S41">BLENDVPD</a> (S4.1<br />
+                <span class="intr">_mm_blendv_pd</span><br />
+                <a href="simdimg/si.php@f=vblendmpd.htm" target="_blank" class="IL_V5">VBLENDMPD</a> (V5...<br />
+                <span class="intr">_mm_mask_blend_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=blendps.htm" target="_blank" class="IL_S41">BLENDPS</a> (S4.1<br />
+                <span class="intr">_mm_blend_ps</span><br />
+                <a href="simdimg/si.php@f=blendvps.htm" target="_blank" class="IL_S41">BLENDVPS</a> (S4.1<br />
+                <span class="intr">_mm_blendv_ps</span><br />
+                <a href="simdimg/si.php@f=vblendmps.htm" target="_blank" class="IL_V5">VBLENDMPS</a> (V5...<br />
+                <span class="intr">_mm_mask_blend_ps</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>move and duplicate</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+
+            <td>
+                <a href="simdimg/si.php@f=movddup.htm" target="_blank" class="IL_S3">MOVDDUP</a> (S3<br />
+                <span class="intr">
+                    _mm_movedup_pd<br />
+                    _mm_loaddup_pd
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=movshdup.htm" target="_blank" class="IL_S3">MOVSHDUP</a> (S3<br />
+                <span class="intr">_mm_movehdup_ps</span><br />
+                <a href="simdimg/si.php@f=movsldup.htm" target="_blank" class="IL_S3">MOVSLDUP</a> (S3<br />
+                <span class="intr">_mm_moveldup_ps</span>
+            </td>
+            <td></td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>mask move</th>
+            <td>
+                <a href="simdimg/si.php@f=vpmaskmovq.htm" target="_blank" class="IL_V2">VPMASKMOVQ</a> (V2<br />
+                <span class="intr">
+                    _mm_maskload_epi64<br />
+                    _mm_maskstore_epi64
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vpmaskmovd.htm" target="_blank" class="IL_V2">VPMASKMOVD</a> (V2<br />
+                <span class="intr">
+                    _mm_maskload_epi32<br />
+                    _mm_maskstore_epi32
+                </span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+
+            <td>
+                <a href="simdimg/si.php@f=vmaskmovpd.htm" target="_blank" class="IL_V1">VMASKMOVPD</a> (V1<br />
+                <span class="intr">
+                    _mm_maskload_pd<br />
+                    _mm_maskstore_pd
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vmaskmovps.htm" target="_blank" class="IL_V1">VMASKMOVPS</a> (V1<br />
+                <span class="intr">
+                    _mm_maskload_ps<br />
+                    _mm_maskstore_ps
+                </span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th rowspan="2">extract highest bit</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=pmovmskb.htm" target="_blank" class="IL_S2">PMOVMSKB</a> (S2<br />
+                <span class="intr">_mm_movemask_epi8</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=movmskpd.htm" target="_blank" class="IL_S2">MOVMSKPD</a> (S2<br />
+                <span class="intr">_mm_movemask_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=movmskps.htm" target="_blank" class="IL_S1">MOVMSKPS</a> (S1<br />
+                <span class="intr">_mm_movemask_ps</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/si.php@f=vpmovq2m.htm" target="_blank" class="IL_V5">VPMOVQ2M</a> (V5+DQ...<br />
+                <span class="intr">_mm_movepi64_mask</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vpmovd2m.htm" target="_blank" class="IL_V5">VPMOVD2M</a> (V5+DQ...<br />
+                <span class="intr">_mm_movepi32_mask</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vpmovw2m.htm" target="_blank" class="IL_V5">VPMOVW2M</a> (V5+BW...<br />
+                <span class="intr">_mm_movepi16_mask</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vpmovb2m.htm" target="_blank" class="IL_V5">VPMOVB2M</a> (V5+BW...<br />
+                <span class="intr">_mm_movepi8_mask</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+
+
+        <tr>
+            <th>gather<br /><img src="simdimg/gather.png" /></th>
+            <td>
+                <a href="simdimg/si.php@f=vpgatherdq.htm" target="_blank" class="IL_V2">VPGATHERDQ</a> (V2<br />
+                <span class="intr">
+                    _mm_i32gather_epi64<br />
+                    _mm_mask_i32gather_epi64
+                </span><br />
+                <a href="simdimg/si.php@f=vpgatherqq.htm" target="_blank" class="IL_V2">VPGATHERQQ</a> (V2<br />
+                <span class="intr">
+                    _mm_i64gather_epi64<br />
+                    _mm_mask_i64gather_epi64
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vpgatherdd.htm" target="_blank" class="IL_V2">VPGATHERDD</a> (V2<br />
+                <span class="intr">
+                    _mm_i32gather_epi32<br />
+                    _mm_mask_i32gather_epi32
+                </span><br />
+                <a href="simdimg/si.php@f=vpgatherqd.htm" target="_blank" class="IL_V2">VPGATHERQD</a> (V2<br />
+                <span class="intr">
+                    _mm_i64gather_epi32<br />
+                    _mm_mask_i64gather_epi32
+                </span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+
+            <td>
+                <a href="simdimg/si.php@f=vgatherdpd.htm" target="_blank" class="IL_V2">VGATHERDPD</a> (V2<br />
+                <span class="intr">
+                    _mm_i32gather_pd<br />
+                    _mm_mask_i32gather_pd
+                </span><br />
+                <a href="simdimg/si.php@f=vgatherqpd.htm" target="_blank" class="IL_V2">VGATHERQPD</a> (V2<br />
+                <span class="intr">
+                    _mm_i64gather_pd<br />
+                    _mm_mask_i64gather_pd
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vgatherdps.htm" target="_blank" class="IL_V2">VGATHERDPS</a> (V2<br />
+                <span class="intr">
+                    _mm_i32gather_ps<br />
+                    _mm_mask_i32gather_ps
+                </span><br />
+                <a href="simdimg/si.php@f=vgatherqps.htm" target="_blank" class="IL_V2">VGATHERQPS</a> (V2<br />
+                <span class="intr">
+                    _mm_i64gather_ps<br />
+                    _mm_mask_i64gather_ps
+                </span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>scatter<br /><img src="simdimg/scatter.png" /></th>
+            <td>
+                <a href="simdimg/si.php@f=vpscatterdq.htm" target="_blank" class="IL_V5">VPSCATTERDQ</a> (V5...<br />
+                <span class="intr">
+                    _mm_i32scatter_epi64<br />
+                    _mm_mask_i32scatter_epi64
+                </span><br />
+                <a href="simdimg/si.php@f=vpscatterqq.htm" target="_blank" class="IL_V5">VPSCATTERQQ</a> (V5...<br />
+                <span class="intr">
+                    _mm_i64scatter_epi64<br />
+                    _mm_mask_i64scatter_epi64
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vpscatterdd.htm" target="_blank" class="IL_V5">VPSCATTERDD</a> (V5...<br />
+                <span class="intr">
+                    _mm_i32scatter_epi32<br />
+                    _mm_mask_i32scatter_epi32
+                </span><br />
+                <a href="simdimg/si.php@f=vpscatterqd.htm" target="_blank" class="IL_V5">VPSCATTERQD</a> (V5...<br />
+                <span class="intr">
+                    _mm_i64scatter_epi32<br />
+                    _mm_mask_i64scatter_epi32
+                </span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+
+            <td>
+                <a href="simdimg/si.php@f=vscatterdpd.htm" target="_blank" class="IL_V5">VSCATTERDPD</a> (V5...<br />
+                <span class="intr">
+                    _mm_i32scatter_pd<br />
+                    _mm_mask_i32scatter_pd
+                </span><br />
+                <a href="simdimg/si.php@f=vscatterqpd.htm" target="_blank" class="IL_V5">VSCATTERQPD</a> (V5...<br />
+                <span class="intr">
+                    _mm_i64scatter_pd<br />
+                    _mm_mask_i64scatter_pd
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vscatterdps.htm" target="_blank" class="IL_V5">VSCATTERDPS</a> (V5...<br />
+                <span class="intr">
+                    _mm_i32scatter_ps<br />
+                    _mm_mask_i32scatter_ps
+                </span><br />
+                <a href="simdimg/si.php@f=vscatterqps.htm" target="_blank" class="IL_V5">VSCATTERQPS</a> (V5...<br />
+                <span class="intr">
+                    _mm_i64scatter_ps<br />
+                    _mm_mask_i64scatter_ps
+                </span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+
+        <tr>
+            <th>compress<br /><img src="simdimg/compress.png" /></th>
+            <td>
+                <a href="simdimg/compress.php@f=vpcompressq.htm" target="_blank" class="IL_V5">VPCOMPRESSQ</a> (V5...<br />
+                <span class="intr">_mm_mask_compress_epi64<br />_mm_mask_compressstoreu_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/compress.php@f=vpcompressd.htm" target="_blank" class="IL_V5">VPCOMPRESSD</a> (V5...<br />
+                <span class="intr">_mm_mask_compress_epi32<br />_mm_mask_compressstoreu_epi32</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/compress.php@f=vcompresspd.htm" target="_blank" class="IL_V5">VCOMPRESSPD</a> (V5...<br />
+                <span class="intr">_mm_mask_compress_pd<br />_mm_mask_compressstoreu_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/compress.php@f=vcompressps.htm" target="_blank" class="IL_V5">VCOMPRESSPS</a> (V5...<br />
+                <span class="intr">_mm_mask_compress_ps<br />_mm_mask_compressstoreu_ps</span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <th>expand<br /><img src="simdimg/expand.png" /></th>
+            <td>
+                <a href="simdimg/expand.php@f=vexpandq.htm" target="_blank" class="IL_V5">VEXPANDQ</a> (V5...<br />
+                <span class="intr">_mm_mask_expand_epi64<br />_mm_mask_expandloadu_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/expand.php@f=vexpandd.htm" target="_blank" class="IL_V5">VEXPANDD</a> (V5...<br />
+                <span class="intr">_mm_mask_expand_epi32<br />_mm_mask_expandloadu_epi32</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/expand.php@f=vexpandpd.htm" target="_blank" class="IL_V5">VEXPANDPD</a> (V5...<br />
+                <span class="intr">_mm_mask_expand_pd<br />_mm_mask_expandloadu_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/expand.php@f=vexpandps.htm" target="_blank" class="IL_V5">VEXPANDPS</a> (V5...<br />
+                <span class="intr">_mm_mask_expand_ps<br />_mm_mask_expandloadu_ps</span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <th>align right</th>
+            <td>
+                <a href="simdimg/si.php@f=valignq.htm" target="_blank" class="IL_V5">VALIGNQ</a> (V5...<br />
+                <span class="intr">_mm_alignr_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=valignd.htm" target="_blank" class="IL_V5">VALIGND</a> (V5...<br />
+                <span class="intr">_mm_alignr_epi32</span>
+            </td>
+            <td></td>
+            <td>
+                <a href="simdimg/si.php@f=palignr.htm" target="_blank" class="IL_SS3">PALIGNR</a> (SS3<br />
+                <span class="intr">_mm_alignr_epi8</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+
+
+        </tr>
+
+        <tr>
+            <th>expand Opmask bits</th>
+            <td>
+                <a href="simdimg/si.php@f=vpmovm2q.htm" target="_blank" class="IL_V5">VPMOVM2Q</a> (V5+DQ...<br />
+                <span class="intr">_mm_movm_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vpmovm2d.htm" target="_blank" class="IL_V5">VPMOVM2D</a> (V5+DQ...<br />
+                <span class="intr">_mm_movm_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vpmovm2w.htm" target="_blank" class="IL_V5">VPMOVM2W</a> (V5+BW...<br />
+                <span class="intr">_mm_movm_epi16</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=vpmovm2b.htm" target="_blank" class="IL_V5">VPMOVM2B</a> (V5+BW...<br />
+                <span class="intr">_mm_movm_epi8</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+
+        </tr>
+
+    </table>
+    <p>&nbsp;</p>
+    <h2>Conversions</h2>
+    <table>
+        <tr>
+            <th colspan="2" rowspan="2">from \ to</th>
+            <th colspan="4">Integer</th>
+            <th colspan="3">Floating-Point</th>
+        </tr>
+        <tr>
+            <th>QWORD</th>
+            <th>DWORD</th>
+            <th>WORD</th>
+            <th>BYTE</th>
+            <th>Double</th>
+            <th>Single</th>
+            <th>Half</th>
+        </tr>
+        <tr>
+            <th rowspan="4">Integer</th>
+            <th>QWORD</th>
+            <td></td>
+            <td>
+                <a href="simdimg/downconv.php@f=vpmovqd.htm" target="_blank" class="IL_V5">VPMOVQD</a> (V5...<br />
+                <span class="intr">_mm_cvtepi64_epi32</span><br />
+                <a href="simdimg/downconv.php@f=vpmovsqd.htm" target="_blank" class="IL_V5">VPMOVSQD</a> (V5...<br />
+                <span class="intr">_mm_cvtsepi64_epi32</span><br />
+                <a href="simdimg/downconv.php@f=vpmovusqd.htm" target="_blank" class="IL_V5">VPMOVUSQD</a> (V5...<br />
+                <span class="intr">_mm_cvtusepi64_epi32</span><br />
+            </td>
+            <td>
+                <a href="simdimg/downconv.php@f=vpmovqw.htm" target="_blank" class="IL_V5">VPMOVQW</a> (V5...<br />
+                <span class="intr">_mm_cvtepi64_epi16</span><br />
+                <a href="simdimg/downconv.php@f=vpmovsqw.htm" target="_blank" class="IL_V5">VPMOVSQW</a> (V5...<br />
+                <span class="intr">_mm_cvtsepi64_epi16</span><br />
+                <a href="simdimg/downconv.php@f=vpmovusqw.htm" target="_blank" class="IL_V5">VPMOVUSQW</a> (V5...<br />
+                <span class="intr">_mm_cvtusepi64_epi16</span><br />
+            </td>
+            <td>
+                <a href="simdimg/downconv.php@f=vpmovqb.htm" target="_blank" class="IL_V5">VPMOVQB</a> (V5...<br />
+                <span class="intr">_mm_cvtepi64_epi8</span><br />
+                <a href="simdimg/downconv.php@f=vpmovsqb.htm" target="_blank" class="IL_V5">VPMOVSQB</a> (V5...<br />
+                <span class="intr">_mm_cvtsepi64_epi8</span><br />
+                <a href="simdimg/downconv.php@f=vpmovusqb.htm" target="_blank" class="IL_V5">VPMOVUSQB</a> (V5...<br />
+                <span class="intr">_mm_cvtusepi64_epi8</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=cvtsi2sd.htm" target="_blank" class="IL_S2">CVTSI2SD</a> (S2 scalar only<br />
+                <span class="intr">_mm_cvtsi64_sd</span><br />
+                <a href="simdimg/convert.php@f=vcvtqq2pd.htm" target="_blank" class="IL_V5">VCVTQQ2PD</a>* (V5+DQ...<br />
+                <span class="intr">_mm_cvtepi64_pd</span><br />
+                <a href="simdimg/convert.php@f=vcvtuqq2pd.htm" target="_blank" class="IL_V5">VCVTUQQ2PD</a>* (V5+DQ...<br />
+                <span class="intr">_mm_cvtepu64_pd</span><br />
+
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=cvtsi2ss.htm" target="_blank" class="IL_S1">CVTSI2SS</a> (S1 scalar only<br />
+                <span class="intr">_mm_cvtsi64_ss</span><br />
+                <a href="simdimg/convert.php@f=vcvtqq2ps.htm" target="_blank" class="IL_V5">VCVTQQ2PS</a>* (V5+DQ...<br />
+                <span class="intr">_mm_cvtepi64_ps</span><br />
+                <a href="simdimg/convert.php@f=vcvtuqq2ps.htm" target="_blank" class="IL_V5">VCVTUQQ2PS</a>* (V5+DQ...<br />
+                <span class="intr">_mm_cvtepu64_ps</span><br />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>DWORD</th>
+            <td>
+                <a href="#tip3" target="_blank" class="IL_S2">TIP 3</a><br />
+                <a href="simdimg/pmovsx.php@f=pmovsxdq.htm" target="_blank" class="IL_S41">PMOVSXDQ</a> (S4.1<br />
+                <span class="intr">_mm_ cvtepi32_epi64</span><br />
+                <a href="simdimg/pmovsx.php@f=pmovzxdq.htm" target="_blank" class="IL_S41">PMOVZXDQ</a> (S4.1<br />
+                <span class="intr">_mm_ cvtepu32_epi64</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=packssdw.htm" target="_blank" class="IL_S2">PACKSSDW</a> (S2<br />
+                <span class="intr">_mm_packs_epi32</span><br />
+                <a href="simdimg/si.php@f=packssdw.htm" target="_blank" class="IL_S41">PACKUSDW</a> (S4.1<br />
+                <span class="intr">_mm_packus_epi32</span><br />
+                <a href="simdimg/downconv.php@f=vpmovdw.htm" target="_blank" class="IL_V5">VPMOVDW</a> (V5...<br />
+                <span class="intr">_mm_cvtepi32_epi16</span><br />
+                <a href="simdimg/downconv.php@f=vpmovsdw.htm" target="_blank" class="IL_V5">VPMOVSDW</a> (V5...<br />
+                <span class="intr">_mm_cvtsepi32_epi16</span><br />
+                <a href="simdimg/downconv.php@f=vpmovusdw.htm" target="_blank" class="IL_V5">VPMOVUSDW</a> (V5...<br />
+                <span class="intr">_mm_cvtusepi32_epi16</span><br />
+            </td>
+            <td>
+                <a href="simdimg/downconv.php@f=vpmovdb.htm" target="_blank" class="IL_V5">VPMOVDB</a> (V5...<br />
+                <span class="intr">_mm_cvtepi32_epi8</span><br />
+                <a href="simdimg/downconv.php@f=vpmovsdb.htm" target="_blank" class="IL_V5">VPMOVSDB</a> (V5...<br />
+                <span class="intr">_mm_cvtsepi32_epi8</span><br />
+                <a href="simdimg/downconv.php@f=vpmovusdb.htm" target="_blank" class="IL_V5">VPMOVUSDB</a> (V5...<br />
+                <span class="intr">_mm_cvtusepi32_epi8</span><br />
+            </td>
+            <td>
+                <a href="simdimg/convert.php@f=cvtdq2pd.htm" target="_blank" class="IL_S2">CVTDQ2PD</a>* (S2<br />
+                <span class="intr">_mm_cvtepi32_pd</span><br />
+                <a href="simdimg/convert.php@f=vcvtudq2pd.htm" target="_blank" class="IL_V5">VCVTUDQ2PD</a>* (V5...<br />
+                <span class="intr">_mm_cvtepu32_pd</span><br />
+            </td>
+            <td>
+                <a href="simdimg/convert.php@f=cvtdq2ps.htm" target="_blank" class="IL_S2">CVTDQ2PS</a>* (S2<br />
+                <span class="intr">_mm_cvtepi32_ps</span><br />
+                <a href="simdimg/convert.php@f=vcvtudq2ps.htm" target="_blank" class="IL_V5">VCVTUDQ2PS</a>* (V5...<br />
+                <span class="intr">_mm_cvtepu32_ps</span><br />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>WORD</th>
+            <td>
+                <a href="simdimg/pmovsx.php@f=pmovsxwq.htm" target="_blank" class="IL_S41">PMOVSXWQ</a> (S4.1<br />
+                <span class="intr">_mm_ cvtepi16_epi64</span><br />
+                <a href="simdimg/pmovsx.php@f=pmovzxwq.htm" target="_blank" class="IL_S41">PMOVZXWQ</a> (S4.1<br />
+                <span class="intr">_mm_ cvtepu16_epi64</span>
+            </td>
+            <td>
+                <a href="#tip3" target="_blank" class="IL_S2">TIP 3</a><br />
+                <a href="simdimg/pmovsx.php@f=pmovsxwd.htm" target="_blank" class="IL_S41">PMOVSXWD</a> (S4.1<br />
+                <span class="intr">_mm_ cvtepi16_epi32</span><br />
+                <a href="simdimg/pmovsx.php@f=pmovzxwd.htm" target="_blank" class="IL_S41">PMOVZXWD</a> (S4.1<br />
+                <span class="intr">_mm_ cvtepu16_epi32</span>
+            </td>
+            <td></td>
+            <td>
+                <a href="simdimg/si.php@f=packsswb.htm" target="_blank" class="IL_S2">PACKSSWB</a> (S2<br />
+                <span class="intr">_mm_packs_epi16</span><br />
+                <a href="simdimg/si.php@f=packsswb.htm" target="_blank" class="IL_S2">PACKUSWB</a> (S2<br />
+                <span class="intr">_mm_packus_epi16</span><br />
+                <a href="simdimg/downconv.php@f=vpmovwb.htm" target="_blank" class="IL_V5">VPMOVWB</a> (V5+BW...<br />
+                <span class="intr">_mm_cvtepi16_epi8</span><br />
+                <a href="simdimg/downconv.php@f=vpmovswb.htm" target="_blank" class="IL_V5">VPMOVSWB</a> (V5+BW...<br />
+                <span class="intr">_mm_cvtsepi16_epi8</span><br />
+                <a href="simdimg/downconv.php@f=vpmovuswb.htm" target="_blank" class="IL_V5">VPMOVUSWB</a> (V5+BW...<br />
+                <span class="intr">_mm_cvtusepi16_epi8</span><br />
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>BYTE</th>
+            <td>
+                <a href="simdimg/pmovsx.php@f=pmovsxbq.htm" target="_blank" class="IL_S41">PMOVSXBQ</a> (S4.1<br />
+                <span class="intr">_mm_ cvtepi8_epi64</span><br />
+                <a href="simdimg/pmovsx.php@f=pmovzxbq.htm" target="_blank" class="IL_S41">PMOVZXBQ</a> (S4.1<br />
+                <span class="intr">_mm_ cvtepu8_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/pmovsx.php@f=pmovsxbd.htm" target="_blank" class="IL_S41">PMOVSXBD</a> (S4.1<br />
+                <span class="intr">_mm_ cvtepi8_epi32</span><br />
+                <a href="simdimg/pmovsx.php@f=pmovzxbd.htm" target="_blank" class="IL_S41">PMOVZXBD</a> (S4.1<br />
+                <span class="intr">_mm_ cvtepu8_epi32</span>
+            </td>
+            <td>
+                <a href="#tip3" target="_blank" class="IL_S2">TIP 3</a><br />
+                <a href="simdimg/pmovsx.php@f=pmovsxbw.htm" target="_blank" class="IL_S41">PMOVSXBW</a> (S4.1<br />
+                <span class="intr">_mm_ cvtepi8_epi16</span><br />
+                <a href="simdimg/pmovsx.php@f=pmovzxbw.htm" target="_blank" class="IL_S41">PMOVZXBW</a> (S4.1<br />
+                <span class="intr">_mm_ cvtepu8_epi16</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th rowspan="3">Floating-Point</th>
+            <th>Double</th>
+            <td>
+                <a href="simdimg/si.php@f=cvtsd2si.htm" target="_blank" class="IL_S2">CVTSD2SI</a> /
+                <a href="simdimg/si.php@f=cvtsd2si.htm" target="_blank" class="IL_S2">CVTTSD2SI</a> (S2 scalar only<br />
+                <span class="intr">_mm_cvtsd_si64 / _mm_cvttsd_si64</span><br />
+
+                <a href="simdimg/convert.php@f=vcvtpd2qq.htm" target="_blank" class="IL_V5">VCVTPD2QQ</a>* /
+                <a href="simdimg/convert.php@f=vcvttpd2qq.htm" target="_blank" class="IL_V5">VCVTTPD2QQ</a>* (V5+DQ...<br />
+                <span class="intr">_mm_cvtpd_epi64 / _mm_cvttpd_epi64</span><br />
+
+                <a href="simdimg/convert.php@f=vcvtpd2uqq.htm" target="_blank" class="IL_V5">VCVTPD2UQQ</a>* /
+                <a href="simdimg/convert.php@f=vcvttpd2uqq.htm" target="_blank" class="IL_V5">VCVTTPD2UQQ</a>* (V5+DQ...<br />
+                <span class="intr">_mm_cvtpd_epu64 / _mm_cvttpd_epu64</span><br />
+                right ones are with truncation
+            </td>
+            <td>
+                <a href="simdimg/convert.php@f=cvtpd2dq.htm" target="_blank" class="IL_S2">CVTPD2DQ</a>* /
+                <a href="simdimg/convert.php@f=cvttpd2dq.htm" target="_blank" class="IL_S2">CVTTPD2DQ</a>* (S2<br />
+                <span class="intr">_mm_cvtpd_epi32 / _mm_cvttpd_epi32</span><br />
+
+                <a href="simdimg/convert.php@f=vcvtpd2udq.htm" target="_blank" class="IL_V5">VCVTPD2UDQ</a>* /
+                <a href="simdimg/convert.php@f=vcvttpd2udq.htm" target="_blank" class="IL_V5">VCVTTPD2UDQ</a>* (V5...<br />
+                <span class="intr">_mm_cvtpd_epu32 / _mm_cvttpd_epu32</span><br />
+                right ones are with truncation
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/convert.php@f=cvtpd2ps.htm" target="_blank" class="IL_S2">CVTPD2PS</a>* (S2<br />
+                <span class="intr">_mm_cvtpd_ps</span>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>Single</th>
+            <td>
+                <a href="simdimg/si.php@f=cvtss2si.htm" target="_blank" class="IL_S1">CVTSS2SI</a> /
+                <a href="simdimg/si.php@f=cvtss2si.htm" target="_blank" class="IL_S1">CVTTSS2SI</a> (S1 scalar only<br />
+                <span class="intr">_mm_cvtss_si64 / _mm_cvttss_si64</span><br />
+
+                <a href="simdimg/convert.php@f=vcvtps2qq.htm" target="_blank" class="IL_V5">VCVTPS2QQ</a>* /
+                <a href="simdimg/convert.php@f=vcvttps2qq.htm" target="_blank" class="IL_V5">VCVTTPS2QQ</a>* (V5+DQ...<br />
+                <span class="intr">_mm_cvtps_epi64 / _mm_cvttps_epi64</span><br />
+
+                <a href="simdimg/convert.php@f=vcvtps2uqq.htm" target="_blank" class="IL_V5">VCVTPS2UQQ</a>* /
+                <a href="simdimg/convert.php@f=vcvttps2uqq.htm" target="_blank" class="IL_V5">VCVTTPS2UQQ</a>* (V5+DQ...<br />
+                <span class="intr">_mm_cvtps_epu64 / _mm_cvttps_epu64</span><br />
+                right ones are with truncation
+            </td>
+            <td>
+                <a href="simdimg/convert.php@f=cvtps2dq.htm" target="_blank" class="IL_S2">CVTPS2DQ</a>* /
+                <a href="simdimg/convert.php@f=cvttps2dq.htm" target="_blank" class="IL_S2">CVTTPS2DQ</a>* (S2<br />
+                <span class="intr">_mm_cvtps_epi32 / _mm_cvttps_epi32</span><br />
+
+                <a href="simdimg/convert.php@f=vcvtps2udq.htm" target="_blank" class="IL_V5">VCVTPS2UDQ</a>* /
+                <a href="simdimg/convert.php@f=vcvttps2udq.htm" target="_blank" class="IL_V5">VCVTTPS2UDQ</a>* (V5...<br />
+                <span class="intr">_mm_cvtps_epu32 / _mm_cvttps_epu32</span><br />
+                right ones are with truncation
+            </td>
+            <td>&nbsp;</td>
+            <td></td>
+            <td>
+                <a href="simdimg/convert.php@f=cvtps2pd.htm" target="_blank" class="IL_S2">CVTPS2PD</a>* (S2<br />
+                <span class="intr">_mm_cvtps_pd</span>
+            </td>
+            <td></td>
+            <td>
+                <span class="IL_V1">VCVTPS2PH</span> (F16C<br />
+                <span class="intr">_mm_cvtps_ph</span>
+            </td>
+        </tr>
+        <tr>
+            <th>Half</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
+                <span class="IL_V1">VCVTPH2PS</span> (F16C<br />
+                <span class="intr">_mm_cvtph_ps</span>
+            </td>
+            <td></td>
+        </tr>
+
+    </table>
+    <p>&nbsp;</p>
+    <h2>Arithmetic Operations</h2>
+
+
+
+    <table>
+        <tr>
+            <th rowspan="2">&nbsp;</th>
+            <th colspan="4">Integer</th>
+            <th colspan="3">Floating-Point</th>
+        </tr>
+        <tr>
+            <th>QWORD</th>
+            <th>DWORD</th>
+            <th>WORD</th>
+            <th>BYTE</th>
+            <th>Double</th>
+            <th>Single</th>
+            <th>Half</th>
+        </tr>
+        <tr>
+            <th>add</th>
+            <td>
+                <a href="simdimg/binop.php@f=paddq.htm" target="_blank" class="IL_S2">PADDQ</a> (S2<br />
+                <span class="intr">_mm_add_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=paddd.htm" target="_blank" class="IL_S2">PADDD</a> (S2<br />
+                <span class="intr">_mm_add_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=paddw.htm" target="_blank" class="IL_S2">PADDW</a> (S2<br />
+                <span class="intr">_mm_add_epi16</span><br />
+                <a href="simdimg/binop.php@f=paddsw.htm" target="_blank" class="IL_S2">PADDSW</a> (S2<br />
+                <span class="intr">_mm_adds_epi16</span><br />
+                <a href="simdimg/binop.php@f=paddusw.htm" target="_blank" class="IL_S2">PADDUSW</a> (S2<br />
+                <span class="intr">_mm_adds_epu16</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=paddb.htm" target="_blank" class="IL_S2">PADDB</a> (S2<br />
+                <span class="intr">_mm_add_epi8</span><br />
+                <a href="simdimg/binop.php@f=paddsb.htm" target="_blank" class="IL_S2">PADDSB</a> (S2<br />
+                <span class="intr">_mm_adds_epi8</span><br />
+                <a href="simdimg/binop.php@f=paddusb.htm" target="_blank" class="IL_S2">PADDUSB</a> (S2<br />
+                <span class="intr">_mm_adds_epu8</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=addpd.htm" target="_blank" class="IL_S2">ADDPD</a>* (S2<br />
+                <span class="intr">_mm_add_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=addps.htm" target="_blank" class="IL_S1">ADDPS</a>* (S1<br />
+                <span class="intr">_mm_add_ps</span>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>sub</th>
+            <td>
+                <a href="simdimg/binop.php@f=psubq.htm" target="_blank" class="IL_S2">PSUBQ</a> (S2<br />
+                <span class="intr">_mm_sub_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=psubd.htm" target="_blank" class="IL_S2">PSUBD</a> (S2<br />
+                <span class="intr">_mm_sub_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=psubw.htm" target="_blank" class="IL_S2">PSUBW</a> (S2<br />
+                <span class="intr">_mm_sub_epi16</span><br />
+                <a href="simdimg/binop.php@f=psubsw.htm" target="_blank" class="IL_S2">PSUBSW</a> (S2<br />
+                <span class="intr">_mm_subs_epi16</span><br />
+                <a href="simdimg/binop.php@f=psubusw.htm" target="_blank" class="IL_S2">PSUBUSW</a> (S2<br />
+                <span class="intr">_mm_subs_epu16</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=psubb.htm" target="_blank" class="IL_S2">PSUBB</a> (S2<br />
+                <span class="intr">_mm_sub_epi8</span><br />
+                <a href="simdimg/binop.php@f=psubsb.htm" target="_blank" class="IL_S2">PSUBSB</a> (S2<br />
+                <span class="intr">_mm_subs_epi8</span><br />
+                <a href="simdimg/binop.php@f=psubusb.htm" target="_blank" class="IL_S2">PSUBUSB</a> (S2<br />
+                <span class="intr">_mm_subs_epu8</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=subpd.htm" target="_blank" class="IL_S2">SUBPD</a>* (S2<br />
+                <span class="intr">_mm_sub_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=subps.htm" target="_blank" class="IL_S1">SUBPS</a>* (S1<br />
+                <span class="intr">_mm_sub_ps</span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>mul</th>
+            <td>
+                <a href="simdimg/binopv5.php@f=vpmullq.htm" target="_blank" class="IL_V5">VPMULLQ</a> (V5+DQ...<br />
+                <span class="intr">_mm_mullo_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pmuldq.htm" target="_blank" class="IL_S41">PMULDQ</a> (S4.1<br />
+                <span class="intr">_mm_mul_epi32</span> <br />
+                <a href="simdimg/si.php@f=pmuldq.htm" target="_blank" class="IL_S2">PMULUDQ</a> (S2<br />
+                <span class="intr">_mm_mul_epu32</span><br />
+                <a href="simdimg/binop.php@f=pmulld.htm" target="_blank" class="IL_S41">PMULLD</a> (S4.1<br />
+                <span class="intr">_mm_mullo_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=pmulhw.htm" target="_blank" class="IL_S2">PMULHW</a> (S2<br />
+                <span class="intr">_mm_mulhi_epi16</span><br />
+                <a href="simdimg/binop.php@f=pmulhuw.htm" target="_blank" class="IL_S2">PMULHUW</a> (S2<br />
+                <span class="intr">_mm_mulhi_epu16</span> <br />
+                <a href="simdimg/binop.php@f=pmullw.htm" target="_blank" class="IL_S2">PMULLW</a> (S2<br />
+                <span class="intr">_mm_mullo_epi16</span><br />
+            </td>
+            <td></td>
+            <td>
+                <a href="simdimg/binop.php@f=mulpd.htm" target="_blank" class="IL_S2">MULPD</a>* (S2<br />
+                <span class="intr">_mm_mul_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=mulps.htm" target="_blank" class="IL_S1">MULPS</a>* (S1<br />
+                <span class="intr">_mm_mul_ps</span>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>div</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/binop.php@f=divpd.htm" target="_blank" class="IL_S2">DIVPD</a>* (S2<br />
+                <span class="intr">_mm_div_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=divps.htm" target="_blank" class="IL_S1">DIVPS</a>* (S1<br />
+                <span class="intr">_mm_div_ps</span>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>reciprocal</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/unopv5.php@f=vrcp14pd.htm" target="_blank" class="IL_V5">VRCP14PD</a>* (V5...<br />
+                <span class="intr">_mm_rcp14_pd</span><br />
+                <a href="simdimg/unopv5.php@f=vrcp28pd.htm" target="_blank" class="IL_V5">VRCP28PD</a>* (V5+ER<br />
+                <span class="intr">_mm512_rcp28_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/unop.php@f=rcpps.htm" target="_blank" class="IL_S1">RCPPS</a>* (S1<br />
+                <span class="intr">_mm_rcp_ps</span><br />
+                <a href="simdimg/unopv5.php@f=vrcp14ps.htm" target="_blank" class="IL_V5">VRCP14PS</a>* (V5...<br />
+                <span class="intr">_mm_rcp14_ps</span><br />
+                <a href="simdimg/unopv5.php@f=vrcp28ps.htm" target="_blank" class="IL_V5">VRCP28PS</a>* (V5+ER<br />
+                <span class="intr">_mm512_rcp28_ps</span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>square root</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/unop.php@f=sqrtpd.htm" target="_blank" class="IL_S2">SQRTPD</a>* (S2<br />
+                <span class="intr">_mm_sqrt_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/unop.php@f=sqrtps.htm" target="_blank" class="IL_S1">SQRTPS</a>* (S1<br />
+                <span class="intr">_mm_sqrt_ps</span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>reciprocal of square root</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/unopv5.php@f=vrsqrt14pd.htm" target="_blank" class="IL_V5">VRSQRT14PD</a>* (V5...<br />
+                <span class="intr">_mm_rsqrt14_pd</span><br />
+                <a href="simdimg/unopv5.php@f=vrsqrt28pd.htm" target="_blank" class="IL_V5">VRSQRT28PD</a>* (V5+ER<br />
+                <span class="intr">_mm512_rsqrt28_pd</span><br />
+
+            </td>
+            <td>
+                <a href="simdimg/unop.php@f=rsqrtps.htm" target="_blank" class="IL_S1">RSQRTPS</a>* (S1<br />
+                <span class="intr">_mm_rsqrt_ps</span><br />
+                <a href="simdimg/unopv5.php@f=vrsqrt14ps.htm" target="_blank" class="IL_V5">VRSQRT14PS</a>* (V5...<br />
+                <span class="intr">_mm_rsqrt14_ps</span><br />
+                <a href="simdimg/unopv5.php@f=vrsqrt28ps.htm" target="_blank" class="IL_V5">VRSQRT28PS</a>* (V5+ER<br />
+                <span class="intr">_mm_rsqrt28_ps</span><br />
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>power of two</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/unopv5.php@f=vexp2pd.htm" target="_blank" class="IL_V5">VEXP2PD</a>* (V5+ER<br />
+                <span class="intr">_mm512_exp2a23_roundpd</span><br />
+            </td>
+            <td>
+                <a href="simdimg/unopv5.php@f=vexp2ps.htm" target="_blank" class="IL_V5">VEXP2PS</a>* (V5+ER<br />
+                <span class="intr">_mm512_exp2a23_round_ps</span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>multiply nth power of 2</th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/binopv5.php@f=vscalefpd.htm" target="_blank" class="IL_V5">VSCALEFPD</a>* (V5...<br />
+                <span class="intr">_mm_scalef_pd</span><br />
+            </td>
+            <td>
+                <a href="simdimg/binopv5.php@f=vscalefps.htm" target="_blank" class="IL_V5">VSCALEFPS</a>* (V5...<br />
+                <span class="intr">_mm_scalef_ps</span><br />
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>max</th>
+            <td>
+                <a href="#tip8" target="_blank" class="IL_S42">TIP 8</a><br />
+                <a href="simdimg/binopv5.php@f=vpmaxsq.htm" target="_blank" class="IL_V5">VPMAXSQ</a> (V5...<br />
+                <span class="intr">_mm_max_epi64</span><br />
+                <a href="simdimg/binopv5.php@f=vpmaxuq.htm" target="_blank" class="IL_V5">VPMAXUQ</a> (V5...<br />
+                <span class="intr">_mm_max_epu64</span>
+            </td>
+            <td>
+                <a href="#tip8" target="_blank" class="IL_S2">TIP 8</a><br />
+                <a href="simdimg/binop.php@f=pmaxsd.htm" target="_blank" class="IL_S41">PMAXSD</a> (S4.1<br />
+                <span class="intr">_mm_max_epi32</span><br />
+                <a href="simdimg/binop.php@f=pmaxud.htm" target="_blank" class="IL_S41">PMAXUD</a> (S4.1<br />
+                <span class="intr">_mm_max_epu32</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=pmaxsw.htm" target="_blank" class="IL_S2">PMAXSW</a> (S2<br />
+                <span class="intr">_mm_max_epi16</span><br />
+                <a href="simdimg/binop.php@f=pmaxuw.htm" target="_blank" class="IL_S41">PMAXUW</a> (S4.1<br />
+                <span class="intr">_mm_max_epu16</span>
+            </td>
+            <td>
+                <a href="#tip8" target="_blank" class="IL_S2">TIP 8</a><br />
+                <a href="simdimg/binop.php@f=pmaxsb.htm" target="_blank" class="IL_S41">PMAXSB</a> (S4.1<br />
+                <span class="intr">_mm_max_epi8</span><br />
+                <a href="simdimg/binop.php@f=pmaxub.htm" target="_blank" class="IL_S2">PMAXUB</a> (S2<br />
+                <span class="intr">_mm_max_epu8</span>
+            </td>
+            <td>
+                <a href="#tip8" target="_blank" class="IL_S2">TIP 8</a><br />
+                <a href="simdimg/binop.php@f=maxpd.htm" target="_blank" class="IL_S2">MAXPD</a>* (S2<br />
+                <span class="intr">_mm_max_pd</span>
+            </td>
+            <td>
+                <a href="#tip8" target="_blank" class="IL_S1">TIP 8</a><br />
+                <a href="simdimg/binop.php@f=maxps.htm" target="_blank" class="IL_S1">MAXPS</a>* (S1<br />
+                <span class="intr">_mm_max_ps</span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>min</th>
+            <td>
+                <a href="#tip8" target="_blank" class="IL_S42">TIP 8</a><br />
+                <a href="simdimg/binopv5.php@f=vpminsq.htm" target="_blank" class="IL_V5">VPMINSQ</a> (V5...<br />
+                <span class="intr">_mm_min_epi64</span><br />
+                <a href="simdimg/binopv5.php@f=vpminuq.htm" target="_blank" class="IL_V5">VPMINUQ</a> (V5...<br />
+                <span class="intr">_mm_min_epu64</span>
+            </td>
+            <td>
+                <a href="#tip8" target="_blank" class="IL_S2">TIP 8</a><br />
+                <a href="simdimg/binop.php@f=pminsd.htm" target="_blank" class="IL_S41">PMINSD</a> (S4.1<br />
+                <span class="intr">_mm_min_epi32</span><br />
+                <a href="simdimg/binop.php@f=pminud.htm" target="_blank" class="IL_S41">PMINUD</a> (S4.1<br />
+                <span class="intr">_mm_min_epu32</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=pminsw.htm" target="_blank" class="IL_S2">PMINSW</a> (S2<br />
+                <span class="intr">_mm_min_epi16</span><br />
+                <a href="simdimg/binop.php@f=pminuw.htm" target="_blank" class="IL_S41">PMINUW</a> (S4.1<br />
+                <span class="intr">_mm_min_epu16</span><br />
+            </td>
+            <td>
+                <a href="#tip8" target="_blank" class="IL_S2">TIP 8</a><br />
+                <a href="simdimg/binop.php@f=pminsb.htm" target="_blank" class="IL_S41">PMINSB</a> (S4.1<br />
+                <span class="intr">_mm_min_epi8</span><br />
+                <a href="simdimg/binop.php@f=pminub.htm" target="_blank" class="IL_S2">PMINUB</a> (S2<br />
+                <span class="intr">_mm_min_epu8</span>
+            </td>
+            <td>
+                <a href="#tip8" target="_blank" class="IL_S2">TIP 8</a><br />
+                <a href="simdimg/binop.php@f=minpd.htm" target="_blank" class="IL_S2">MINPD</a>* (S2<br />
+                <span class="intr">_mm_min_pd</span>
+            </td>
+            <td>
+                <a href="#tip8" target="_blank" class="IL_S1">TIP 8</a><br />
+                <a href="simdimg/binop.php@f=minps.htm" target="_blank" class="IL_S1">MINPS</a>* (S1<br />
+                <span class="intr">_mm_min_ps</span>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>average</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/binop.php@f=pavgw.htm" target="_blank" class="IL_S2">PAVGW</a> (S2<br />
+                <span class="intr">_mm_avg_epu16</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=pavgb.htm" target="_blank" class="IL_S2">PAVGB</a> (S2<br />
+                <span class="intr">_mm_avg_epu8</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>absolute</th>
+            <td>
+                <a href="#tip4" target="_blank" class="IL_S42">TIP 4</a><br />
+                <a href="simdimg/unopv5.php@f=vpabsq.htm" target="_blank" class="IL_V5">VPABSQ</a> (V5...<br />
+                <span class="intr">_mm_abs_epi64</span>
+            </td>
+            <td>
+                <a href="#tip4" target="_blank" class="IL_S2">TIP 4</a><br />
+                <a href="simdimg/unop.php@f=pabsd.htm" target="_blank" class="IL_SS3">PABSD</a> (SS3<br />
+                <span class="intr">_mm_abs_epi32</span>
+            </td>
+            <td>
+                <a href="#tip4" target="_blank" class="IL_S2">TIP 4</a><br />
+                <a href="simdimg/unop.php@f=pabsw.htm" target="_blank" class="IL_SS3">PABSW</a> (SS3<br />
+                <span class="intr">_mm_abs_epi16</span>
+            </td>
+            <td>
+                <a href="#tip4" target="_blank" class="IL_S2">TIP 4</a><br />
+                <a href="simdimg/unop.php@f=pabsb.htm" target="_blank" class="IL_SS3">PABSB</a> (SS3<br />
+                <span class="intr">_mm_abs_epi8</span>
+            </td>
+            <td><a href="#tip5" target="_blank" class="IL_S2">TIP 5</a></td>
+            <td><a href="#tip5" target="_blank" class="IL_S1">TIP 5</a></td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>sign operation</th>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/binop.php@f=psignd.htm" target="_blank" class="IL_SS3">PSIGND</a> (SS3<br />
+                <span class="intr">_mm_sign_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=psignw.htm" target="_blank" class="IL_SS3">PSIGNW</a> (SS3<br />
+                <span class="intr">_mm_sign_epi16</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=psignb.htm" target="_blank" class="IL_SS3">PSIGNB</a> (SS3<br />
+                <span class="intr">_mm_sign_epi8</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>round</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@&f=roundpd.htm" target="_blank" class="IL_S41">ROUNDPD</a>* (S4.1<br />
+                <span class="intr">
+                    _mm_round_pd<br />
+                    _mm_floor_pd<br />
+                    _mm_ceil_pd
+                </span><br />
+                <a href="simdimg/unopv5.php@&f=vrndscalepd.htm" target="_blank" class="IL_V5">VRNDSCALEPD</a>* (V5...<br />
+                <span class="intr">_mm_roundscale_pd</span><br />
+            </td>
+            <td>
+                <a href="simdimg/si.php@&f=roundps.htm" target="_blank" class="IL_S41">ROUNDPS</a>* (S4.1<br />
+                <span class="intr">
+                    _mm_round_ps<br />
+                    _mm_floor_ps<br />
+                    _mm_ceil_ps
+                </span><br />
+                <a href="simdimg/unopv5.php@&f=vrndscaleps.htm" target="_blank" class="IL_V5">VRNDSCALEPS</a>* (V5...<br />
+                <span class="intr">_mm_roundscale_ps</span><br />
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>difference from rounded value</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/unopv5.php@&f=vreducepd.htm" target="_blank" class="IL_V5">VREDUCEPD</a>* (V5+DQ...<br />
+                <span class="intr">_mm_reduce_pd</span><br />
+            </td>
+            <td>
+                <a href="simdimg/unopv5.php@&f=vreduceps.htm" target="_blank" class="IL_V5">VREDUCEPS</a>* (V5+DQ...<br />
+                <span class="intr">_mm_reduce_ps</span><br />
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>add / sub</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=addsubpd.htm" target="_blank" class="IL_S3">ADDSUBPD</a> (S3<br />
+                <span class="intr">_mm_addsub_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=addsubps.htm" target="_blank" class="IL_S3">ADDSUBPS</a> (S3<br />
+                <span class="intr">_mm_addsub_ps</span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>horizontal add</th>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=phaddd.htm" target="_blank" class="IL_SS3">PHADDD</a> (SS3<br />
+                <span class="intr">_mm_hadd_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=phaddw.htm" target="_blank" class="IL_SS3">PHADDW</a> (SS3<br />
+                <span class="intr">_mm_hadd_epi16</span><br />
+                <a href="simdimg/si.php@f=phaddw.htm" target="_blank" class="IL_SS3">PHADDSW</a> (SS3<br />
+                <span class="intr">_mm_hadds_epi16</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=haddpd.htm" target="_blank" class="IL_S3">HADDPD</a> (S3<br />
+                <span class="intr">_mm_hadd_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=haddps.htm" target="_blank" class="IL_S3">HADDPS</a> (S3<br />
+                <span class="intr">_mm_hadd_ps</span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>horizontal sub</th>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=phsubd.htm" target="_blank" class="IL_SS3">PHSUBD</a> (SS3<br />
+                <span class="intr">_mm_hsub_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=phsubw.htm" target="_blank" class="IL_SS3">PHSUBW</a> (SS3<br />
+                <span class="intr">_mm_hsub_epi16</span><br />
+                <a href="simdimg/si.php@f=phsubw.htm" target="_blank" class="IL_SS3">PHSUBSW</a> (SS3<br />
+                <span class="intr">_mm_hsubs_epi16</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=hsubpd.htm" target="_blank" class="IL_S3">HSUBPD</a> (S3<br />
+                <span class="intr">_mm_hsub_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=hsubps.htm" target="_blank" class="IL_S3">HSUBPS</a> (S3<br />
+                <span class="intr">_mm_hsub_ps</span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>dot product</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/si.php@f=dppd.htm" target="_blank" class="IL_S41">DPPD</a> (S4.1<br />
+                <span class="intr">_mm_dp_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=dpps.htm" target="_blank" class="IL_S41">DPPS</a> (S4.1<br />
+                <span class="intr">_mm_dp_ps</span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>multiply and add</th>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/si.php@f=pmaddwd.htm" target="_blank" class="IL_S2">PMADDWD</a> (S2<br />
+                <span class="intr">_mm_madd_epi16</span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=pmaddubsw.htm" target="_blank" class="IL_SS3">PMADDUBSW</a> (SS3<br />
+                <span class="intr">_mm_maddubs_epi16</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>fused multiply and add / sub</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/vfmadd.php@f=pd.htm" target="_blank" class="IL">VFMADDxxxPD</a>*
+                (FMA<br />
+                <span class="intr">_mm_fmadd_pd</span><br />
+                <a href="simdimg/vfmadd.php@f=pd.htm" target="_blank" class="IL">VFMSUBxxxPD</a>*
+                (FMA<br />
+                <span class="intr">_mm_fmsub_pd</span><br />
+                <a href="simdimg/vfmadd.php@f=pd.htm" target="_blank" class="IL">VFMADDSUBxxxPD</a>
+                (FMA<br />
+                <span class="intr">_mm_fmaddsub_pd</span><br />
+                <a href="simdimg/vfmadd.php@f=pd.htm" target="_blank" class="IL">VFMSUBADDxxxPD</a>
+                (FMA<br />
+                <span class="intr">_mm_fmsubadd_pd</span><br />
+                <a href="simdimg/vfmadd.php@f=pd.htm" target="_blank" class="IL">VFNMADDxxxPD</a>*
+                (FMA<br />
+                <span class="intr">_mm_fnmadd_pd</span><br />
+                <a href="simdimg/vfmadd.php@f=pd.htm" target="_blank" class="IL">VFNMSUBxxxPD</a>*
+                (FMA<br />
+                <span class="intr">_mm_fnmsub_pd</span><br />
+                xxx=132/213/231<br />
+            </td>
+            <td>
+                <a href="simdimg/vfmadd.php@f=ps.htm" target="_blank" class="IL">VFMADDxxxPS</a>*
+                (FMA<br />
+                <span class="intr">_mm_fmadd_ps</span><br />
+                <a href="simdimg/vfmadd.php@f=ps.htm" target="_blank" class="IL">VFMSUBxxxPS</a>*
+                (FMA<br />
+                <span class="intr">_mm_fmsub_ps</span><br />
+                <a href="simdimg/vfmadd.php@f=ps.htm" target="_blank" class="IL">VFMADDSUBxxxPS</a>
+                (FMA<br />
+                <span class="intr">_mm_fmaddsub_ps</span><br />
+                <a href="simdimg/vfmadd.php@f=ps.htm" target="_blank" class="IL">VFMSUBADDxxxPS</a>
+                (FMA<br />
+                <span class="intr">_mm_fmsubadd_ps</span><br />
+                <a href="simdimg/vfmadd.php@f=ps.htm" target="_blank" class="IL">VFNMADDxxxPS</a>*
+                (FMA<br />
+                <span class="intr">_mm_fnmadd_ps</span><br />
+                <a href="simdimg/vfmadd.php@f=ps.htm" target="_blank" class="IL">VFNMSUBxxxPS</a>*
+                (FMA<br />
+                <span class="intr">_mm_fnmsub_ps</span><br />
+                xxx=132/213/231
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+
+
+
+    <p>&nbsp;</p>
+    <h2>Compare</h2>
+
+
+
+    <table>
+        <tr>
+            <th rowspan="2">&nbsp;</th>
+            <th colspan="4">Integer</th>
+        </tr>
+        <tr>
+            <th>QWORD</th>
+            <th>DWORD</th>
+            <th>WORD</th>
+            <th>BYTE</th>
+        </tr>
+        <tr>
+            <th>compare for ==</th>
+            <td>
+                <a href="simdimg/pcmp.php@f=pcmpeqq.htm" target="_blank" class="IL_S41">PCMPEQQ</a> (S4.1<br />
+                <span class="intr">_mm_cmpeq_epi64</span><br />
+                <span class="intr_V5">_mm_cmpeq_epi64_mask (V5...</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpequq.htm" target="_blank" class="IL_V5">VPCMPUQ (0)</a> (V5...<br />
+                <span class="intr">_mm_cmpeq_epu64_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmp.php@f=pcmpeqd.htm" target="_blank" class="IL_S2">PCMPEQD</a> (S2<br />
+                <span class="intr">_mm_cmpeq_epi32</span><br />
+                <span class="intr_V5">_mm_cmpeq_epi32_mask (V5...</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpequd.htm" target="_blank" class="IL_V5">VPCMPUD (0)</a> (V5...<br />
+                <span class="intr">_mm_cmpeq_epu32_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmp.php@f=pcmpeqw.htm" target="_blank" class="IL_S2">PCMPEQW</a> (S2<br />
+                <span class="intr">_mm_cmpeq_epi16</span><br />
+                <span class="intr_V5">_mm_cmpeq_epi16_mask (V5+BW...</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpequw.htm" target="_blank" class="IL_V5">VPCMPUW (0)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpeq_epu16_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmp.php@f=pcmpeqb.htm" target="_blank" class="IL_S2">PCMPEQB</a> (S2<br />
+                <span class="intr">_mm_cmpeq_epi8</span><br />
+                <span class="intr_V5">_mm_cmpeq_epi8_mask (V5+BW...</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpequb.htm" target="_blank" class="IL_V5">VPCMPUB (0)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpeq_epu8_mask</span><br />
+            </td>
+        </tr>
+        <tr>
+            <th>compare for &lt;</th>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpltq.htm" target="_blank" class="IL_V5">VPCMPQ (1)</a> (V5...<br />
+                <span class="intr">_mm_cmplt_epi64_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpltuq.htm" target="_blank" class="IL_V5">VPCMPUQ (1)</a> (V5...<br />
+                <span class="intr">_mm_cmplt_epu64_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpltd.htm" target="_blank" class="IL_V5">VPCMPD (1)</a> (V5...<br />
+                <span class="intr">_mm_cmplt_epi32_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpltud.htm" target="_blank" class="IL_V5">VPCMPUD (1)</a> (V5...<br />
+                <span class="intr">_mm_cmplt_epu32_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpltw.htm" target="_blank" class="IL_V5">VPCMPW (1)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmplt_epi16_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpltuw.htm" target="_blank" class="IL_V5">VPCMPUW (1)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmplt_epu16_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpltb.htm" target="_blank" class="IL_V5">VPCMPB (1)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmplt_epi8_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpltub.htm" target="_blank" class="IL_V5">VPCMPUB (1)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmplt_epu8_mask</span><br />
+            </td>
+        </tr>
+        <tr>
+            <th>compare for &lt;=</th>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpleq.htm" target="_blank" class="IL_V5">VPCMPQ (2)</a> (V5...<br />
+                <span class="intr">_mm_cmple_epi64_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpleuq.htm" target="_blank" class="IL_V5">VPCMPUQ (2)</a> (V5...<br />
+                <span class="intr">_mm_cmple_epu64_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpled.htm" target="_blank" class="IL_V5">VPCMPD (2)</a> (V5...<br />
+                <span class="intr">_mm_cmple_epi32_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpleud.htm" target="_blank" class="IL_V5">VPCMPUD (2)</a> (V5...<br />
+                <span class="intr">_mm_cmple_epu32_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmplew.htm" target="_blank" class="IL_V5">VPCMPW (2)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmple_epi16_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpleuw.htm" target="_blank" class="IL_V5">VPCMPUW (2)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmple_epu16_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpleb.htm" target="_blank" class="IL_V5">VPCMPB (2)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmple_epi8_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpleub.htm" target="_blank" class="IL_V5">VPCMPUB (2)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmple_epu8_mask</span><br />
+            </td>
+        </tr>
+
+        <tr>
+            <th>compare for &gt;</th>
+            <td>
+                <a href="simdimg/pcmp.php@f=pcmpgtq.htm" target="_blank" class="IL_S42">PCMPGTQ</a> (S4.2<br />
+                <span class="intr">_mm_cmpgt_epi64</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnleq.htm" target="_blank" class="IL_V5">VPCMPQ (6)</a> (V5...<br />
+                <span class="intr">_mm_cmpgt_epi64_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnleuq.htm" target="_blank" class="IL_V5">VPCMPUQ (6)</a> (V5...<br />
+                <span class="intr">_mm_cmpgt_epu64_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmp.php@f=pcmpgtd.htm" target="_blank" class="IL_S2">PCMPGTD</a> (S2<br />
+                <span class="intr">_mm_cmpgt_epi32</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnled.htm" target="_blank" class="IL_V5">VPCMPD (6)</a> (V5...<br />
+                <span class="intr">_mm_cmpgt_epi32_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnleud.htm" target="_blank" class="IL_V5">VPCMPUD (6)</a> (V5...<br />
+                <span class="intr">_mm_cmpgt_epu32_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmp.php@f=pcmpgtw.htm" target="_blank" class="IL_S2">PCMPGTW</a> (S2<br />
+                <span class="intr">_mm_cmpgt_epi16</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnlew.htm" target="_blank" class="IL_V5">VPCMPW (6)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpgt_epi16_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnleuw.htm" target="_blank" class="IL_V5">VPCMPUW (6)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpgt_epu16_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmp.php@f=pcmpgtb.htm" target="_blank" class="IL_S2">PCMPGTB</a> (S2<br />
+                <span class="intr">_mm_cmpgt_epi8</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnleb.htm" target="_blank" class="IL_V5">VPCMPB (6)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpgt_epi8_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnleub.htm" target="_blank" class="IL_V5">VPCMPUB (6)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpgt_epu8_mask</span><br />
+            </td>
+        </tr>
+        <tr>
+            <th>compare for &gt;=</th>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpnltq.htm" target="_blank" class="IL_V5">VPCMPQ (5)</a> (V5...<br />
+                <span class="intr">_mm_cmpge_epi64_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnltuq.htm" target="_blank" class="IL_V5">VPCMPUQ (5)</a> (V5...<br />
+                <span class="intr">_mm_cmpge_epu64_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpnltd.htm" target="_blank" class="IL_V5">VPCMPD (5)</a> (V5...<br />
+                <span class="intr">_mm_cmpge_epi32_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnltud.htm" target="_blank" class="IL_V5">VPCMPUD (5)</a> (V5...<br />
+                <span class="intr">_mm_cmpge_epu32_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpnltw.htm" target="_blank" class="IL_V5">VPCMPW (5)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpge_epi16_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnltuw.htm" target="_blank" class="IL_V5">VPCMPUW (5)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpge_epu16_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpnltb.htm" target="_blank" class="IL_V5">VPCMPB (5)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpge_epi8_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnltub.htm" target="_blank" class="IL_V5">VPCMPUB (5)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpge_epu8_mask</span><br />
+            </td>
+        </tr>
+        <tr>
+            <th>compare for !=</th>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpneqq.htm" target="_blank" class="IL_V5">VPCMPQ (4)</a> (V5...<br />
+                <span class="intr">_mm_cmpneq_epi64_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnequq.htm" target="_blank" class="IL_V5">VPCMPUQ (4)</a> (V5...<br />
+                <span class="intr">_mm_cmpneq_epu64_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpneqd.htm" target="_blank" class="IL_V5">VPCMPD (4)</a> (V5...<br />
+                <span class="intr">_mm_cmpneq_epi32_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnequd.htm" target="_blank" class="IL_V5">VPCMPUD (4)</a> (V5...<br />
+                <span class="intr">_mm_cmpneq_epu32_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpneqw.htm" target="_blank" class="IL_V5">VPCMPW (4)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpneq_epi16_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnequw.htm" target="_blank" class="IL_V5">VPCMPUW (4)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpneq_epu16_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/pcmpv5.php@f=vpcmpneqb.htm" target="_blank" class="IL_V5">VPCMPB (4)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpneq_epi8_mask</span><br />
+                <a href="simdimg/pcmpv5.php@f=vpcmpnequb.htm" target="_blank" class="IL_V5">VPCMPUB (4)</a> (V5+BW...<br />
+                <span class="intr">_mm_cmpneq_epu8_mask</span><br />
+            </td>
+        </tr>
+    </table>
+    <p>&nbsp;</p>
+    <table>
+        <tr>
+            <th>
+            </th>
+            <th colspan="9">Floating-Point</th>
+        </tr>
+
+        <tr>
+            <th>
+            </th>
+            <th colspan="4">Double</th>
+            <th colspan="4">Single</th>
+            <th>Half</th>
+        </tr>
+
+        <tr>
+            <th>when either (or both) is Nan</th>
+            <th colspan="2">condition unmet</th>
+            <th colspan="2">condition met</th>
+            <th colspan="2">condition unmet</th>
+            <th colspan="2">condition met</th>
+            <th>&nbsp;</th>
+        </tr>
+
+        <tr>
+            <th>
+                Exception on QNaN
+            </th>
+            <th>YES</th>
+            <th>NO</th>
+            <th>YES</th>
+            <th>NO</th>
+            <th>YES</th>
+            <th>NO</th>
+            <th>YES</th>
+            <th>NO</th>
+            <th>&nbsp;</th>
+        </tr>
+
+        <tr>
+            <th>compare for ==</th>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpeq_ospd.htm" target="_blank" class="IL_V1">VCMPEQ_OSPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpeqpd.htm" target="_blank" class="IL_S2">CMPEQPD</a>* (S2<br />
+                <span class="intr">_mm_cmpeq_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpeq_uspd.htm" target="_blank" class="IL_V1">VCMPEQ_USPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpeq_uqpd.htm" target="_blank" class="IL_V1">VCMPEQ_UQPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpeq_osps.htm" target="_blank" class="IL_V1">VCMPEQ_OSPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpeqps.htm" target="_blank" class="IL_S1">CMPEQPS</a>* (S1<br />
+                <span class="intr">_mm_cmpeq_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpeq_usps.htm" target="_blank" class="IL_V1">VCMPEQ_USPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpeq_uqps.htm" target="_blank" class="IL_V1">VCMPEQ_UQPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <th>compare for &lt;</th>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpltpd.htm" target="_blank" class="IL_S2">CMPLTPD</a>* (S2<br />
+                <span class="intr">_mm_cmplt_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmplt_oqpd.htm" target="_blank" class="IL_V1">VCMPLT_OQPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpltps.htm" target="_blank" class="IL_S1">CMPLTPS</a>* (S1<br />
+                <span class="intr">_mm_cmplt_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmplt_oqps.htm" target="_blank" class="IL_V1">VCMPLT_OQPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>compare for &lt;=</th>
+            <td>
+                <a href="simdimg/cmp.php@f=cmplepd.htm" target="_blank" class="IL_S2">CMPLEPD</a>* (S2<br />
+                <span class="intr">_mm_cmple_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmple_oqpd.htm" target="_blank" class="IL_V1">VCMPLE_OQPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpleps.htm" target="_blank" class="IL_S1">CMPLEPS</a>* (S1<br />
+                <span class="intr">_mm_cmple_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmple_oqps.htm" target="_blank" class="IL_V1">VCMPLE_OQPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>compare for &gt;</th>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpgtpd.htm" target="_blank" class="IL_V1">VCMPGTPD</a>* (V1<br />
+                <span class="intr_S2">_mm_cmpgt_pd (S2</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpgt_oqpd.htm" target="_blank" class="IL_V1">VCMPGT_OQPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpgtps.htm" target="_blank" class="IL_V1">VCMPGTPS</a>* (V1<br />
+                <span class="intr_S1">_mm_cmpgt_ps (S1</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpgt_oqps.htm" target="_blank" class="IL_V1">VCMPGT_OQPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>compare for &gt;=</th>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpgepd.htm" target="_blank" class="IL_V1">VCMPGEPD</a>* (V1<br />
+                <span class="intr_S2">_mm_cmpge_pd (S2</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpge_oqpd.htm" target="_blank" class="IL_V1">VCMPGE_OQPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpgeps.htm" target="_blank" class="IL_V1">VCMPGEPS</a>* (V1<br />
+                <span class="intr_S1">_mm_cmpge_ps (S1</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpge_oqps.htm" target="_blank" class="IL_V1">VCMPGE_OQPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>compare for !=</th>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpneq_ospd.htm" target="_blank" class="IL_V1">VCMPNEQ_OSPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpneq_oqpd.htm" target="_blank" class="IL_V1">VCMPNEQ_OQPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpneq_uspd.htm" target="_blank" class="IL_V1">VCMPNEQ_USPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpneqpd.htm" target="_blank" class="IL_S2">CMPNEQPD</a>* (S2<br />
+                <span class="intr">_mm_cmpneq_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpneq_osps.htm" target="_blank" class="IL_V1">VCMPNEQ_OSPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpneq_oqps.htm" target="_blank" class="IL_V1">VCMPNEQ_OQPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpneq_usps.htm" target="_blank" class="IL_V1">VCMPNEQ_USPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpneqps.htm" target="_blank" class="IL_S1">CMPNEQPS</a>* (S1<br />
+                <span class="intr">_mm_cmpneq_ps</span>
+            </td>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <th>compare for ! &lt;</th>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpnltpd.htm" target="_blank" class="IL_S2">CMPNLTPD</a>* (S2<br />
+                <span class="intr">_mm_cmpnlt_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpnlt_uqpd.htm" target="_blank" class="IL_V1">VCMPNLT_UQPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpnltps.htm" target="_blank" class="IL_S1">CMPNLTPS</a>* (S1<br />
+                <span class="intr">_mm_cmpnlt_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpnlt_uqps.htm" target="_blank" class="IL_V1">VCMPNLT_UQPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <th>compare for ! &lt;=</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpnlepd.htm" target="_blank" class="IL_S2">CMPNLEPD</a>* (S2<br />
+                <span class="intr">_mm_cmpnle_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpnle_uqpd.htm" target="_blank" class="IL_V1">VCMPNLE_UQPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpnleps.htm" target="_blank" class="IL_S1">CMPNLEPS</a>* (S1<br />
+                <span class="intr">_mm_cmpnle_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpnle_uqps.htm" target="_blank" class="IL_V1">VCMPNLE_UQPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <th>compare for ! &gt;</th>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpngtpd.htm" target="_blank" class="IL_V1">VCMPNGTPD</a>* (V1<br />
+                <span class="intr_S2">_mm_cmpngt_pd (S2</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpngt_uqpd.htm" target="_blank" class="IL_V1">VCMPNGT_UQPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpngtps.htm" target="_blank" class="IL_V1">VCMPNGTPS</a>* (V1<br />
+                <span class="intr_S1">_mm_cmpngt_ps (S1</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpngt_uqps.htm" target="_blank" class="IL_V1">VCMPNGT_UQPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <th>compare for ! &gt;=</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpngepd.htm" target="_blank" class="IL_V1">VCMPNGEPD</a>* (V1<br />
+                <span class="intr_S2">_mm_cmpnge_pd (S2</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpnge_uqpd.htm" target="_blank" class="IL_V1">VCMPNGE_UQPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpngeps.htm" target="_blank" class="IL_V1">VCMPNGEPS</a>* (V1<br />
+                <span class="intr_S1">_mm_cmpnge_ps (S1</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpnge_uqps.htm" target="_blank" class="IL_V1">VCMPNGE_UQPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <th>compare for ordered</th>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpord_spd.htm" target="_blank" class="IL_V1">VCMPORD_SPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpordpd.htm" target="_blank" class="IL_S2">CMPORDPD</a>* (S2<br />
+                <span class="intr">_mm_cmpord_pd</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpord_sps.htm" target="_blank" class="IL_V1">VCMPORD_SPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpordps.htm" target="_blank" class="IL_S1">CMPORDPS</a>* (S1<br />
+                <span class="intr">_mm_cmpord_ps</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th>compare for unordered</th>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpunord_spd.htm" target="_blank" class="IL_V1">VCMPUNORD_SPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpunordpd.htm" target="_blank" class="IL_S2">CMPUNORDPD</a>* (S2<br />
+                <span class="intr">_mm_cmpunord_pd</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpunord_sps.htm" target="_blank" class="IL_V1">VCMPUNORD_SPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=cmpunordps.htm" target="_blank" class="IL_S1">CMPUNORDPS</a>* (S1<br />
+                <span class="intr">_mm_cmpunord_ps</span>
+            </td>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <th>TRUE</th>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmptrue_uspd.htm" target="_blank" class="IL_V1">VCMPTRUE_USPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmptruepd.htm" target="_blank" class="IL_V1">VCMPTRUEPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td></td>
+            <td></td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmptrue_usps.htm" target="_blank" class="IL_V1">VCMPTRUE_USPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmptrueps.htm" target="_blank" class="IL_V1">VCMPTRUEPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <th>FALSE</th>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpfalse_ospd.htm" target="_blank" class="IL_V1">VCMPFALSE_OSPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpfalsepd.htm" target="_blank" class="IL_V1">VCMPFALSEPD</a>* (V1<br />
+                <span class="intr">_mm_cmp_pd</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpfalse_osps.htm" target="_blank" class="IL_V1">VCMPFALSE_OSPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>
+                <a href="simdimg/cmp.php@f=vcmpfalseps.htm" target="_blank" class="IL_V1">VCMPFALSEPS</a>* (V1<br />
+                <span class="intr">_mm_cmp_ps</span>
+            </td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+
+    </table>
+    <p>&nbsp;</p>
+    <table>
+        <tr>
+            <th rowspan="2">&nbsp;</th>
+            <th colspan="3">Floating-Point</th>
+        </tr>
+        <tr>
+            <th>Double</th>
+            <th>Single</th>
+            <th>Half</th>
+        </tr>
+        <tr>
+            <th>
+                compare scalar values<br />
+                to set flag register
+            </th>
+            <td>
+                <a href="simdimg/si.php@f=comisd.htm" target="_blank" class="IL_S2">COMISD</a> (S2<br />
+                <span class="intr">
+                    _mm_comieq_sd<br />
+                    _mm_comilt_sd<br />
+                    _mm_comile_sd<br />
+                    _mm_comigt_sd<br />
+                    _mm_comige_sd<br />
+                    _mm_comineq_sd
+                </span><br />
+                <a href="simdimg/si.php@f=comisd.htm" target="_blank" class="IL_S2">UCOMISD</a> (S2<br />
+                <span class="intr">
+                    _mm_ucomieq_sd<br />
+                    _mm_ucomilt_sd<br />
+                    _mm_ucomile_sd<br />
+                    _mm_ucomigt_sd<br />
+                    _mm_ucomige_sd<br />
+                    _mm_ucomineq_sd
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=comisd.htm" target="_blank" class="IL_S1">COMISS</a> (S1<br />
+                <span class="intr">
+                    _mm_comieq_ss<br />
+                    _mm_comilt_ss<br />
+                    _mm_comile_ss<br />
+                    _mm_comigt_ss<br />
+                    _mm_comige_ss<br />
+                    _mm_comineq_ss
+                </span><br />
+                <a href="simdimg/si.php@f=comisd.htm" target="_blank" class="IL_S1">UCOMISS</a> (S1<br />
+                <span class="intr">
+                    _mm_ucomieq_ss<br />
+                    _mm_ucomilt_ss<br />
+                    _mm_ucomile_ss<br />
+                    _mm_ucomigt_ss<br />
+                    _mm_ucomige_ss<br />
+                    _mm_ucomineq_ss
+                </span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2>Bitwise Logical Operations</h2>
+    <table>
+        <tr>
+            <th rowspan="2">&nbsp;</th>
+            <th colspan="4">Integer</th>
+            <th colspan="3">Floating-Point</th>
+        </tr>
+        <tr>
+            <th>QWORD</th>
+            <th>DWORD</th>
+            <th>WORD</th>
+            <th>BYTE</th>
+            <th>Double</th>
+            <th>Single</th>
+            <th>Half</th>
+        </tr>
+        <tr>
+            <th rowspan="2">and</th>
+            <td colspan="4">
+                <a href="simdimg/binop.php@f=pand.htm" target="_blank" class="IL_S2">PAND</a> (S2<br />
+                <span class="intr">_mm_and_si128</span>
+            </td>
+            <td rowspan="2">
+                <a href="simdimg/binop.php@f=andpd.htm" target="_blank" class="IL_S2">ANDPD</a> (S2<br />
+                <span class="intr">_mm_and_pd</span>
+            </td>
+            <td rowspan="2">
+                <a href="simdimg/binop.php@f=andps.htm" target="_blank" class="IL_S1">ANDPS</a> (S1<br />
+                <span class="intr">_mm_and_ps</span>
+            </td>
+            <td rowspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/binopv5.php@f=vpandq.htm" target="_blank" class="IL_V5">VPANDQ</a> (V5...<br />
+                <span class="intr">_mm512_and_epi64<br />etc</span>
+            </td>
+            <td>
+                <a href="simdimg/binopv5.php@f=vpandd.htm" target="_blank" class="IL_V5">VPANDD</a> (V5...<br />
+                <span class="intr">_mm512_and_epi32<br />etc</span>
+
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <th rowspan="2">and not</th>
+            <td colspan="4">
+                <a href="simdimg/binop.php@f=pandn.htm" target="_blank" class="IL_S2">PANDN</a> (S2<br />
+                <span class="intr">_mm_andnot_si128</span>
+            </td>
+            <td rowspan="2">
+                <a href="simdimg/binop.php@f=andnpd.htm" target="_blank" class="IL_S2">ANDNPD</a> (S2<br />
+                <span class="intr">_mm_andnot_pd</span>
+            </td>
+            <td rowspan="2">
+                <a href="simdimg/binop.php@f=andnps.htm" target="_blank" class="IL_S1">ANDNPS</a> (S1<br />
+                <span class="intr">_mm_andnot_ps</span>
+            </td>
+            <td rowspan="2">&nbsp;</td>
+        </tr>
+
+        <tr>
+            <td>
+                <a href="simdimg/binopv5.php@f=vpandnq.htm" target="_blank" class="IL_V5">VPANDNQ</a> (V5...<br />
+                <span class="intr">_mm512_andnot_epi64<br />etc</span>
+            </td>
+            <td>
+                <a href="simdimg/binopv5.php@f=vpandnd.htm" target="_blank" class="IL_V5">VPANDND</a> (V5...<br />
+                <span class="intr">_mm512_andnot_epi32<br />etc</span>
+
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <th rowspan="2">or</th>
+            <td colspan="4">
+                <a href="simdimg/binop.php@f=por.htm" target="_blank" class="IL_S2">POR</a> (S2<br />
+                <span class="intr">_mm_or_si128</span>
+            </td>
+            <td rowspan="2">
+                <a href="simdimg/binop.php@f=orpd.htm" target="_blank" class="IL_S2">ORPD</a> (S2<br />
+                <span class="intr">_mm_or_pd</span>
+            </td>
+            <td rowspan="2">
+                <a href="simdimg/binop.php@f=orps.htm" target="_blank" class="IL_S1">ORPS</a> (S1<br />
+                <span class="intr">_mm_or_ps</span>
+            </td>
+            <td rowspan="2">&nbsp;</td>
+        </tr>
+
+        <tr>
+            <td>
+                <a href="simdimg/binopv5.php@f=vporq.htm" target="_blank" class="IL_V5">VPORQ</a> (V5...<br />
+                <span class="intr">_mm512_or_epi64<br />etc</span>
+            </td>
+            <td>
+                <a href="simdimg/binopv5.php@f=vpord.htm" target="_blank" class="IL_V5">VPORD</a> (V5...<br />
+                <span class="intr">_mm512_or_epi32<br />etc</span>
+
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <th rowspan="2">xor</th>
+            <td colspan="4">
+                <a href="simdimg/binop.php@f=pxor.htm" target="_blank" class="IL_S2">PXOR</a> (S2<br />
+                <span class="intr">_mm_xor_si128</span>
+            </td>
+            <td rowspan="2">
+                <a href="simdimg/binop.php@f=xorpd.htm" target="_blank" class="IL_S2">XORPD</a> (S2<br />
+                <span class="intr">_mm_xor_pd</span>
+            </td>
+            <td rowspan="2">
+                <a href="simdimg/binop.php@f=xorps.htm" target="_blank" class="IL_S1">XORPS</a> (S1<br />
+                <span class="intr">_mm_xor_ps</span>
+            </td>
+            <td rowspan="2"></td>
+        </tr>
+
+        <tr>
+            <td>
+                <a href="simdimg/binopv5.php@f=vpxorq.htm" target="_blank" class="IL_V5">VPXORQ</a> (V5...<br />
+                <span class="intr">_mm512_xor_epi64<br />etc</span>
+            </td>
+            <td>
+                <a href="simdimg/binopv5.php@f=vpxord.htm" target="_blank" class="IL_V5">VPXORD</a> (V5...<br />
+                <span class="intr">_mm512_xor_epi32<br />etc</span>
+
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <th rowspan="2">test</th>
+            <td colspan="4">
+                <a href="simdimg/si.php@f=ptest.htm" target="_blank" class="IL_S41">PTEST</a> (S4.1<br />
+                <span class="intr">
+                    _mm_testz_si128<br />
+                    _mm_testc_si128<br />
+                    _mm_testnzc_si128
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=testpd.htm" target="_blank" class="IL_V1">VTESTPD</a> (V1<br />
+                <span class="intr">
+                    _mm_testz_pd<br />
+                    _mm_testc_pd<br />
+                    _mm_testnzc_pd
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/si.php@f=testps.htm" target="_blank" class="IL_V1">VTESTPS</a> (V1<br />
+                <span class="intr">
+                    _mm_testz_ps<br />
+                    _mm_testc_ps<br />
+                    _mm_testnzc_ps
+                </span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/ptestv5.php@f=vptestmq.htm" target="_blank" class="IL_V5">VPTESTMQ</a> (V5...<br />
+                <span class="intr">_mm_test_epi64_mask</span><br />
+                <a href="simdimg/ptestv5.php@f=vptestnmq.htm" target="_blank" class="IL_V5">VPTESTNMQ</a> (V5...<br />
+                <span class="intr">_mm_testn_epi64_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/ptestv5.php@f=vptestmd.htm" target="_blank" class="IL_V5">VPTESTMD</a> (V5...<br />
+                <span class="intr">_mm_test_epi32_mask</span><br />
+                <a href="simdimg/ptestv5.php@f=vptestnmd.htm" target="_blank" class="IL_V5">VPTESTNMD</a> (V5...<br />
+                <span class="intr">_mm_testn_epi32_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/ptestv5.php@f=vptestmw.htm" target="_blank" class="IL_V5">VPTESTMW</a> (V5+BW...<br />
+                <span class="intr">_mm_test_epi16_mask</span><br />
+                <a href="simdimg/ptestv5.php@f=vptestnmw.htm" target="_blank" class="IL_V5">VPTESTNMW</a> (V5+BW...<br />
+                <span class="intr">_mm_testn_epi16_mask</span><br />
+            </td>
+            <td>
+                <a href="simdimg/ptestv5.php@f=vptestmb.htm" target="_blank" class="IL_V5">VPTESTMB</a> (V5+BW...<br />
+                <span class="intr">_mm_test_epi8_mask</span><br />
+                <a href="simdimg/ptestv5.php@f=vptestnmb.htm" target="_blank" class="IL_V5">VPTESTNMB</a> (V5+BW...<br />
+                <span class="intr">_mm_testn_epi8_mask</span><br />
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+
+        </tr>
+
+        <tr>
+            <th>ternary operation</th>
+            <td>
+                <a href="simdimg/ternlog.php@f=vpternlogq.htm" target="_blank" class="IL_V5">VPTERNLOGQ</a> (V5...<br />
+                <span class="intr">
+                    _mm_ternarylogic_epi64<br />
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/ternlog.php@f=vpternlogd.htm" target="_blank" class="IL_V5">VPTERNLOGD</a> (V5...<br />
+                <span class="intr">
+                    _mm_ternarylogic_epi32<br />
+                </span>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+
+        </tr>
+
+
+    </table>
+
+
+
+    <p>&nbsp;</p>
+    <h2>Bit Shift / Rotate</h2>
+
+
+
+    <table>
+        <tr>
+            <th rowspan="2">&nbsp;</th>
+            <th colspan="4">Integer</th>
+        </tr>
+        <tr>
+            <th>QWORD</th>
+            <th>DWORD</th>
+            <th>WORD</th>
+            <th>BYTE</th>
+        </tr>
+        <tr>
+            <th rowspan="2">shift left logical</th>
+            <td>
+                <a href="simdimg/shift.php@f=psllq.htm" target="_blank" class="IL_S2">PSLLQ</a> (S2<br />
+                <span class="intr">
+                    _mm_slli_epi64<br />
+                    _mm_sll_epi64
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/shift.php@f=pslld.htm" target="_blank" class="IL_S2">PSLLD</a> (S2<br />
+                <span class="intr">
+                    _mm_slli_epi32<br />
+                    _mm_sll_epi32
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/shift.php@f=psllw.htm" target="_blank" class="IL_S2">PSLLW</a> (S2<br />
+                <span class="intr">
+                    _mm_slli_epi16<br />
+                    _mm_sll_epi16
+                </span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/binop.php@f=vpsllvq.htm" target="_blank" class="IL_V2">VPSLLVQ</a> (V2<br />
+                <span class="intr">_mm_sllv_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=vpsllvd.htm" target="_blank" class="IL_V2">VPSLLVD</a> (V2<br />
+                <span class="intr">_mm_sllv_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/binopv5.php@f=vpsllvw.htm" target="_blank" class="IL_V5">VPSLLVW</a> (V5+BW...<br />
+                <span class="intr">_mm_sllv_epi16</span>
+
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th rowspan="2">shift right logical</th>
+            <td>
+                <a href="simdimg/shift.php@f=psrlq.htm" target="_blank" class="IL_S2">PSRLQ</a> (S2<br />
+                <span class="intr">
+                    _mm_srli_epi64<br />
+                    _mm_srl_epi64
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/shift.php@f=psrld.htm" target="_blank" class="IL_S2">PSRLD</a> (S2<br />
+                <span class="intr">
+                    _mm_srli_epi32<br />
+                    _mm_srl_epi32
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/shift.php@f=psrlw.htm" target="_blank" class="IL_S2">PSRLW</a> (S2<br />
+                <span class="intr">
+                    _mm_srli_epi16<br />
+                    _mm_srl_epi16
+                </span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/binop.php@f=vpsrlvq.htm" target="_blank" class="IL_V2">VPSRLVQ</a> (V2<br />
+                <span class="intr">_mm_srlv_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=vpsrlvd.htm" target="_blank" class="IL_V2">VPSRLVD</a> (V2<br />
+                <span class="intr">_mm_srlv_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/binopv5.php@f=vpsrlvw.htm" target="_blank" class="IL_V5">VPSRLVW</a> (V5+BW...<br />
+                <span class="intr">_mm_srlv_epi16</span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th rowspan="2">shift right arithmetic</th>
+            <td>
+                <a href="simdimg/shiftv5.php@f=vpsraq.htm" target="_blank" class="IL_V5">VPSRAQ</a> (V5...<br />
+                <span class="intr">
+                    _mm_srai_epi64<br />
+                    _mm_sra_epi64
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/shift.php@f=psrad.htm" target="_blank" class="IL_S2">PSRAD</a> (S2<br />
+                <span class="intr">
+                    _mm_srai_epi32<br />
+                    _mm_sra_epi32
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/shift.php@f=psraw.htm" target="_blank" class="IL_S2">PSRAW</a> (S2<br />
+                <span class="intr">
+                    _mm_srai_epi16<br />
+                    _mm_sra_epi16
+                </span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/binopv5.php@f=vpsravq.htm" target="_blank" class="IL_V5">VPSRAVQ</a> (V5...<br />
+                <span class="intr">_mm_srav_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/binop.php@f=vpsravd.htm" target="_blank" class="IL_V2">VPSRAVD</a> (V2<br />
+                <span class="intr">_mm_srav_epi32</span>
+            </td>
+            <td>
+                <a href="simdimg/binopv5.php@f=vpsravw.htm" target="_blank" class="IL_V5">VPSRAVW</a> (V5+BW...<br />
+                <span class="intr">_mm_srav_epi16</span>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <th rowspan="2">rotate left</th>
+            <td>
+                <a href="simdimg/rotate.php@f=vprolq.htm" target="_blank" class="IL_V5">VPROLQ</a> (V5...<br />
+                <span class="intr">_mm_rol_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/rotate.php@f=vprold.htm" target="_blank" class="IL_V5">VPROLD</a> (V5...<br />
+                <span class="intr">_mm_rol_epi32</span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/binopv5.php@f=vprolvq.htm" target="_blank" class="IL_V5">VPROLVQ</a> (V5...<br />
+                <span class="intr">_mm_rolv_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/binopv5.php@f=vprolvd.htm" target="_blank" class="IL_V5">VPROLVD</a> (V5...<br />
+                <span class="intr">_mm_rolv_epi32</span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th rowspan="2">rotate right</th>
+            <td>
+                <a href="simdimg/rotate.php@f=vprorq.htm" target="_blank" class="IL_V5">VPRORQ</a> (V5...<br />
+                <span class="intr">_mm_ror_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/rotate.php@f=vprord.htm" target="_blank" class="IL_V5">VPRORD</a> (V5...<br />
+                <span class="intr">_mm_ror_epi32</span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/binopv5.php@f=vprorvq.htm" target="_blank" class="IL_V5">VPRORVQ</a> (V5...<br />
+                <span class="intr">_mm_rorv_epi64</span>
+            </td>
+            <td>
+                <a href="simdimg/binopv5.php@f=vprorvd.htm" target="_blank" class="IL_V5">VPRORVD</a> (V5...<br />
+                <span class="intr">_mm_rorv_epi32</span>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+
+
+    </table>
+
+
+
+    <p>&nbsp;</p>
+    <h2>Byte Shift</h2>
+    <table>
+        <tr>
+            <th></th>
+            <th>128-bit</th>
+        </tr>
+        <tr>
+            <th>shift left logical</th>
+            <td>
+                <a href="simdimg/si.php@f=pslldq.htm" target="_blank" class="IL_S2">PSLLDQ</a> (S2<br />
+                <span class="intr">_mm_slli_si128</span>
+            </td>
+        </tr>
+        <tr>
+            <th>shift right logical</th>
+            <td>
+                <a href="simdimg/si.php@f=psrldq.htm" target="_blank" class="IL_S2">PSRLDQ</a> (S2<br />
+                <span class="intr">_mm_srli_si128</span>
+            </td>
+        </tr>
+        <tr>
+            <th>packed align right</th>
+            <td>
+                <a href="simdimg/si.php@f=palignr.htm" target="_blank" class="IL_SS3">PALIGNR</a> (SS3<br />
+                <span class="intr">_mm_alignr_epi8</span>
+            </td>
+        </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2>Compare Strings</h2>
+
+    <table>
+        <tr>
+            <th></th>
+            <th>explicit length</th>
+            <th>implicit length</th>
+        </tr>
+
+        <tr>
+            <th>return index</th>
+            <td>
+                <a href="simdimg/str.php@f=pcmpestri.htm" target="_blank" class="IL_S42">PCMPESTRI</a> (S4.2<br />
+                <span class="intr">
+                    _mm_cmpestri<br />
+                    _mm_cmpestra<br />
+                    _mm_cmpestrc<br />
+                    _mm_cmpestro<br />
+                    _mm_cmpestrs<br />
+                    _mm_cmpestrz
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/str.php@f=pcmpistri.htm" target="_blank" class="IL_S42">PCMPISTRI</a> (S4.2<br />
+                <span class="intr">
+                    _mm_cmpistri<br />
+                    _mm_cmpistra<br />
+                    _mm_cmpistrc<br />
+                    _mm_cmpistro<br />
+                    _mm_cmpistrs<br />
+                    _mm_cmpistrz
+                </span>
+            </td>
+        </tr>
+
+        <tr>
+            <th>return mask</th>
+            <td>
+                <a href="simdimg/str.php@f=pcmpestrm.htm" target="_blank" class="IL_S42">PCMPESTRM</a> (S4.2<br />
+                <span class="intr">
+                    _mm_cmpestrm<br />
+                    _mm_cmpestra<br />
+                    _mm_cmpestrc<br />
+                    _mm_cmpestro<br />
+                    _mm_cmpestrs<br />
+                    _mm_cmpestrz
+                </span>
+            </td>
+            <td>
+                <a href="simdimg/str.php@f=pcmpistrm.htm" target="_blank" class="IL_S42">PCMPISTRM</a> (S4.2<br />
+                <span class="intr">
+                    _mm_cmpistrm<br />
+                    _mm_cmpistra<br />
+                    _mm_cmpistrc<br />
+                    _mm_cmpistro<br />
+                    _mm_cmpistrs<br />
+                    _mm_cmpistrz
+                </span>
+            </td>
+        </tr>
+
+    </table>
+
+    <p>&nbsp;</p>
+    <h2>Others</h2>
+    <table>
+        <tr>
+            <td>
+                <a href="simdimg/mxcsr.php@f=ldmxcsr.htm" target="_blank" class="IL_S1">LDMXCSR</a> (S1<br />
+                <span class="intr">_mm_setcsr</span>
+            </td>
+            <td>Load MXCSR register</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/mxcsr.php@f=ldmxcsr.htm" target="_blank" class="IL_S1">STMXCSR</a> (S1<br />
+                <span class="intr">_mm_getcsr</span>
+            </td>
+            <td>Save MXCSR register state</td>
+        </tr>
+    </table>
+    <p></p>
+    <table>
+        <tr>
+            <td>
+                <a href="simdimg/si.php@f=psadbw.htm" target="_blank" class="IL_S2">PSADBW</a> (S2<br />
+                <span class="intr">_mm_sad_epu8</span>
+            </td>
+            <td>Compute sum of absolute differences</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/si.php@f=mpsadbw.htm" target="_blank" class="IL_S41">MPSADBW</a> (S4.1<br />
+                <span class="intr">_mm_mpsadbw_epu8</span>
+            </td>
+            <td>
+                Performs eight 4-byte wide Sum of Absolute Differences operations to produce
+                eight word integers.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/si.php@f=vdbpsadbw.htm" target="_blank" class="IL_V5">VDBPSADBW</a> (V5+BW...<br />
+                <span class="intr">_mm_dbsad_epu8</span>
+                </a>
+            </td>
+            <td>
+                Double Block Packed Sum-Absolute-Differences (SAD) on Unsigned Bytes
+            </td>
+        </tr>
+    </table>
+    <p></p>
+    <table>
+        <tr>
+            <td>
+                <a href="simdimg/binop.php@f=pmulhrsw.htm" target="_blank" class="IL_SS3">PMULHRSW</a> (SS3<br />
+                <span class="intr">_mm_mulhrs_epi16</span>
+            </td>
+            <td>Packed Multiply High with Round and Scale</td>
+        </tr>
+    </table>
+    <p></p>
+    <table>
+        <tr>
+            <td>
+                <a href="simdimg/si.php@f=phminposuw.htm" target="_blank" class="IL_S41">PHMINPOSUW</a> (S4.1<br />
+                <span class="intr">_mm_minpos_epu16</span>
+            </td>
+            <td>
+                Finds the value and location of the minimum unsigned word from one of 8
+                horizontally packed unsigned words. The resulting value and location (offset
+                within the source) are packed into the low dword of the destination XMM
+                register.
+            </td>
+        </tr>
+
+    </table>
+    <p></p>
+
+    <table>
+        <tr>
+            <td>
+                <a href="simdimg/si.php@f=vpconflictq.htm" target="_blank" class="IL_V5">VPCONFLICTQ</a> (V5+CD...<br />
+                <span class="intr">_mm512_conflict_epi64</span><br />
+                <a href="simdimg/si.php@f=vpconflictd.htm" target="_blank" class="IL_V5">VPCONFLICTD</a> (V5+CD...<br />
+                <span class="intr">_mm512_conflict_epi32</span><br />
+            </td>
+            <td>Detect Conflicts Within a Vector of Packed Dword/Qword Values into Dense Memory/ Register</td>
+        </tr>
+    </table>
+    <p></p>
+
+    <table>
+        <tr>
+            <td>
+                <a href="simdimg/unopv5.php@f=vplzcntq.htm" target="_blank" class="IL_V5">VPLZCNTQ</a> (V5+CD...<br />
+                <span class="intr">_mm_lzcnt_epi64</span><br />
+                <a href="simdimg/unopv5.php@f=vplzcntd.htm" target="_blank" class="IL_V5">VPLZCNTD</a> (V5+CD...<br />
+                <span class="intr">_mm_lzcnt_epi32</span><br />
+            </td>
+            <td>Count the Number of Leading Zero Bits for Packed Dword, Packed Qword Values</td>
+        </tr>
+    </table>
+    <p></p>
+
+    <table>
+        <tr>
+            <td>
+                <a href="simdimg/fixup.php@f=vfixupimmpd.htm" target="_blank" class="IL_V5">VFIXUPIMMPD</a>* (V5...<br />
+                <span class="intr">_mm512_fixupimm_pd</span><br />
+                <a href="simdimg/fixup.php@f=vfixupimmps.htm" target="_blank" class="IL_V5">VFIXUPIMMPS</a>* (V5...<br />
+                <span class="intr">_mm512_fixupimm_ps</span><br />
+            </td>
+            <td>Fix Up Special Packed Float64/32 Values</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/fpclass.php@f=vfpclasspd.htm" target="_blank" class="IL_V5">VFPCLASSPD</a>* (V5...<br />
+                <span class="intr">_mm512_fpclass_pd_mask</span><br />
+                <a href="simdimg/fpclass.php@f=vfpclassps.htm" target="_blank" class="IL_V5">VFPCLASSSD</a>* (V5...<br />
+                <span class="intr">_mm512_fpclass_sd_mask</span><br />
+            </td>
+            <td>Tests Types Of a Packed Float64/32 Values</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/binopv5.php@f=vrangepd.htm" target="_blank" class="IL_V5">VRANGEPD</a>* (V5+DQ...<br />
+                <span class="intr">_mm_range_pd</span><br />
+                <a href="simdimg/binopv5.php@f=vrangeps.htm" target="_blank" class="IL_V5">VRANGEPS</a>* (V5+DQ...<br />
+                <span class="intr">_mm_range_pd</span><br />
+            </td>
+            <td>
+                Range Restriction Calculation For Packed Pairs of Float64/32 Values
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="IL_V5">VGETEXPPD</span>* (V5...<br />
+                <span class="intr">_mm512_getexp_pd</span><br />
+                <span class="IL_V5">VGETEXPPS</span>* (V5...<br />
+                <span class="intr">_mm512_getexp_ps</span><br />
+            </td>
+            <td>
+                Convert Exponents of Packed DP/SP FP Values to FP Values
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="IL_V5">VGETMANTPD</span>* (V5...<br />
+                <span class="intr">_mm512_getmant_pd</span><br />
+                <span class="IL_V5">VGETMANTPS</span>* (V5...<br />
+                <span class="intr">_mm512_getmant_ps</span><br />
+            </td>
+            <td>
+                Extract Float64/32 Vector of Normalized Mantissas from Float64/32 Vector
+            </td>
+        </tr>
+    </table>
+    <p></p>
+
+    <table>
+        <tr>
+            <td>
+                <a href="simdimg/aes.php@f=aesdec.htm" target="_blank" class="IL">AESDEC</a> (AESNI<br />
+                <span class="intr">_mm_aesdec_si128</span>
+            </td>
+            <td>Perform an AES decryption round using an 128-bit state and a round key</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/aes.php@f=aesdeclast.htm" target="_blank" class="IL">AESDECLAST</a> (AESNI<br />
+                <span class="intr">_mm_aesdeclast_si128</span>
+            </td>
+            <td>Perform the last AES decryption round using an 128-bit state and a round key</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/aes.php@f=aesenc.htm" target="_blank" class="IL">AESENC</a> (AESNI<br />
+                <span class="intr">_mm_aesenc_si128</span>
+            </td>
+            <td>Perform an AES encryption round using an 128-bit state and a round key</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/aes.php@f=aesenclast.htm" target="_blank" class="IL">AESENCLAST</a> (AESNI<br />
+                <span class="intr">_mm_aesenclast_si128</span>
+            </td>
+            <td>Perform the last AES encryption round using an 128-bit state and a round key</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/aes.php@f=aesimc.htm" target="_blank" class="IL">AESIMC</a> (AESNI<br />
+                <span class="intr">_mm_aesimc_si128</span>
+            </td>
+            <td>Perform an inverse mix column transformation primitive</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/aes.php@f=aeskeygenassist.htm" target="_blank" class="IL">AESKEYGENASSIST</a> (AESNI<br />
+                <span class="intr">_mm_aeskeygenassist_si128</span>
+            </td>
+            <td>Assist the creation of round keys with a key expansion schedule</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/pclmulqdq.html" target="_blank" class="IL">PCLMULQDQ</a> (PCLMULQDQ<br />
+                <span class="intr">_mm_clmulepi64_si128</span>
+            </td>
+            <td>Perform carryless multiplication of two 64-bit numbers</td>
+        </tr>
+    </table>
+    <p></p>
+    <table>
+        <tr>
+            <td>
+                <a href="simdimg/sha1.html" target="_blank" class="IL">SHA1RNDS4</a> (SHA<br />
+                <span class="intr">_mm_sha1rnds4_epu32</span>
+                </a>
+            </td>
+            <td>Perform Four Rounds of SHA1 Operation</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/sha1.html" target="_blank" class="IL">SHA1NEXTE</a> (SHA<br />
+                <span class="intr">_mm_sha1nexte_epu32</span>
+                </a>
+            </td>
+            <td>Calculate SHA1 State Variable E after Four Rounds</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/sha1.html" target="_blank" class="IL">SHA1MSG1</a> (SHA<br />
+                <span class="intr">_mm_sha1msg1_epu32</span>
+                </a>
+            </td>
+            <td>Perform an Intermediate Calculation for the Next Four SHA1 Message Dwords</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/sha1.html" target="_blank" class="IL">SHA1MSG2</a> (SHA<br />
+                <span class="intr">_mm_sha1msg2_epu32</span>
+                </a>
+            </td>
+            <td>Perform a Final Calculation for the Next Four SHA1 Message Dwords</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/sha256.html" target="_blank" class="IL">SHA256RNDS2</a> (SHA<br />
+                <span class="intr">_mm_sha256rnds2_epu32</span>
+                </a>
+            </td>
+            <td>Perform Two Rounds of SHA256 Operation</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/sha256.html" target="_blank" class="IL">SHA256MSG1</a> (SHA<br />
+                <span class="intr">_mm_sha256msg1_epu32</span>
+                </a>
+            </td>
+            <td>Perform an Intermediate Calculation for the Next Four SHA256 Message</td>
+        </tr>
+        <tr>
+            <td>
+                <a href="simdimg/sha256.html" target="_blank" class="IL">SHA256MSG2</a> (SHA<br />
+                <span class="intr">_mm_sha256msg2_epu32</span>
+                </a>
+            </td>
+            <td>Perform a Final Calculation for the Next Four SHA256 Message Dwords</td>
+        </tr>
+    </table>
+
+    <p></p>
+    <table>
+        <tr>
+            <td>
+                <a href="simdimg/si.php@f=vpbroadcastmb2q.htm" target="_blank" class="IL_V5">VPBROADCASTMB2Q</a> (V5+CD...<br />
+                <span class="intr">_mm_broadcastmb_epi64</span><br />
+                <a href="simdimg/si.php@f=vpbroadcastmw2d.htm" target="_blank" class="IL_V5">VPBROADCASTMW2D</a> (V5+CD...<br />
+                <span class="intr">_mm_broadcastmw_epi32</span><br />
+            </td>
+            <td>Broadcast Mask to Vector Register</td>
+
+        </tr>
+    </table>
+
+    <p></p>
+    <table>
+        <tr>
+            <td>
+                <span class="IL_V1">VZEROALL</span> (V1<br />
+                <span class="intr">_mm256_zeroall</span>
+            </td>
+            <td>Zero all YMM registers</td>
+        </tr>
+        <tr>
+            <td>
+                <span class="IL_V1">VZEROUPPER</span> (V1<br />
+                <span class="intr">_mm256_zeroupper</span>
+            </td>
+            <td>Zero upper 128 bits of all YMM registers</td>
+        </tr>
+    </table>
+
+
+    <p></p>
+    <table>
+        <tr>
+            <td>
+                <span class="IL_S1">MOVNTPS</span> (S1<br />
+                <span class="intr">_mm_stream_ps</span>
+            </td>
+            <td>
+                Non-temporal store of four packed single-precision floating-point values
+                from an XMM register into memory
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="IL_S2">MASKMOVDQU</span> (S2<br />
+                <span class="intr">_mm_maskmoveu_si128</span>
+            </td>
+            <td>Non-temporal store of selected bytes from an XMM register into memory</td>
+        </tr>
+        <tr>
+            <td>
+                <span class="IL_S2">MOVNTPD</span> (S2<br />
+                <span class="intr">_mm_stream_pd</span>
+            </td>
+            <td>
+                Non-temporal store of two packed double-precision
+                floating-point values from an XMM register into memory
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="IL_S2">MOVNTDQ</span> (S2<br />
+                <span class="intr">_mm_stream_si128</span>
+            </td>
+            <td>Non-temporal store of double quadword from an XMM register into memory</td>
+        </tr>
+        <tr>
+            <td>
+                <span class="IL_S3">LDDQU</span> (S3<br />
+                <span class="intr">_mm_lddqu_si128</span>
+            </td>
+            <td>Special 128-bit unaligned load designed to avoid cache line splits</td>
+        </tr>
+        <tr>
+            <td>
+                <span class="IL_S41">MOVNTDQA</span> (S4.1<br />
+                <span class="intr">_mm_stream_load_si128 </span>
+            </td>
+            <td>
+                Provides a non-temporal hint that can cause adjacent 16-byte items within an
+                aligned 64-byte region (a streaming line) to be fetched and held in a small set
+                of temporary buffers ("streaming load buffers"). Subsequent streaming loads to
+                other aligned 16-byte items in the same streaming line may be supplied from the
+                streaming load buffer and can improve throughput.
+            </td>
+        </tr>
+    </table>
+    <p></p>
+    <table>
+        <tr>
+            <td>
+                <span class="IL_V5">VGATHERPFxDPS</span> (V5+PF<br />
+                <span class="intr">_mm512_mask_prefetch_i32gather_ps</span><br />
+                <span class="IL_V5">VGATHERPFxQPS</span> (V5+PF<br />
+                <span class="intr">_mm512_mask_prefetch_i64gather_ps</span><br />
+                <span class="IL_V5">VGATHERPFxDPD</span> (V5+PF<br />
+                <span class="intr">_mm512_mask_prefetch_i32gather_pd</span><br />
+                <span class="IL_V5">VGATHERPFxQPD</span> (V5+PF<br />
+                <span class="intr">_mm512_mask_prefetch_i64gather_pd</span><br />
+                x=0/1
+            </td>
+            <td>
+                Sparse Prefetch
+                Packed SP/DP Data Values with Signed Dword, Signed Qword Indices Using T0/T1 Hint
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="IL_V5">VSCATTERPFxDPS</span> (V5+PF<br />
+                <span class="intr">_mm512_prefetch_i32scatter_ps</span><br />
+                <span class="IL_V5">VSCATTERPFxQPS</span> (V5+PF<br />
+                <span class="intr">_mm512_prefetch_i64scatter_ps</span><br />
+                <span class="IL_V5">VSCATTERPFxDPD</span> (V5+PF<br />
+                <span class="intr">_mm512_prefetch_i32scatter_pd</span><br />
+                <span class="IL_V5">VSCATTERPFxQPD</span> (V5+PF<br />
+                <span class="intr">_mm512_prefetch_i64scatter_pd</span><br />
+                x=0/1
+            </td>
+            <td>
+                Sparse Prefetch
+                Packed SP/DP Data Values with Signed Dword, Signed Qword Indices Using T0/T1 Hint with Intent
+                to Write
+            </td>
+        </tr>
+
+
+
+    </table>
+
+    <p>
+        &nbsp;
+    </p>
+    <p>&nbsp;</p>
+
+    <h1>TIPS</h1>
+    <h2 id="tip1">TIP 1: Zero Clear</h2>
+    <p>
+        XOR instructions do for both Integer and Floating-point.
+    </p>
+    <p>Example: Zero all of 2 QWORDS / 4 DWORDS / 8 WORDS / 16 BYTES in XMM1</p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+        <a href="simdimg/binop.php@f=pxor.htm" target="_blank" class="IL">pxor</a>         xmm1, xmm1</pre>
+    </div>
+
+
+
+    <p>Example: Set 0.0f to 4 floats in XMM1</p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+        <a href="simdimg/binop.php@f=xorps.htm" target="_blank" class="IL">xorps</a>        xmm1, xmm1</pre>
+    </div>
+    <p>Example: Set 0.0 to 2 doubles in XMM1</p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+        <a href="simdimg/binop.php@f=xorpd.htm" target="_blank" class="IL">xorpd</a>        xmm1, xmm1</pre>
+    </div>
+    <p>&nbsp;</p>
+    <h2 id="tip2">TIP 2: Copy the lowest 1 element to other elements in XMM register</h2>
+    <p>Shuffle instructions do.</p>
+    <p>Example: Copy the lowest float element to other 3 elements in XMM1.</p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+        <a href="simdimg/si.php@f=shufps.htm" target="_blank" class="IL">shufps</a>       xmm1, xmm1, 0
+</pre>
+    </div>
+    <p>Example: Copy the lowest WORD element to other 7 elements in XMM1</p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+        <a href="simdimg/si.php@f=pshuflw.htm" target="_blank" class="IL">pshuflw</a>       xmm1, xmm1, 0
+        <a href="simdimg/si.php@f=pshufd.htm" target="_blank" class="IL">pshufd</a>        xmm1, xmm1, 0
+</pre>
+    </div>
+
+
+
+    <p>Example: Copy the lower QWORD element to the upper element in XMM1</p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+        <a href="simdimg/si.php@f=pshufd.htm" target="_blank" class="IL">pshufd</a>        xmm1, xmm1, 44h     ; 01 00 01 00 B = 44h
+</pre>
+    </div>
+
+
+
+    <p>Is this better?</p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+        <a href="simdimg/unpack.php@f=punpcklqdq.htm" target="_blank" class="IL">punpcklqdq</a>    xmm1, xmm1
+</pre>
+    </div>
+    <p>&nbsp;</p>
+    <h2 id="tip3">TIP 3: Integer Sign Extension / Zero Extension</h2>
+    <p>Unpack instructions do.</p>
+    <p>Example: Zero extend 8 WORDS in XMM1 to DWORDS in XMM1 (lower 4) and XMM2 (upper 4).</p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+        movdqa     xmm2, xmm1     ; src data WORD[7] [6] [5] [4] [3] [2] [1] [0]
+        <a href="simdimg/binop.php@f=pxor.htm" target="_blank" class="IL">pxor</a>       xmm3, xmm3     ; upper 16-bit to attach to each WORD = all 0
+        <a href="simdimg/unpack.php@f=punpcklwd.htm" target="_blank" class="IL">punpcklwd</a>  xmm1, xmm3     ; lower 4 DWORDS:  0 [3] 0 [2] 0 [1] 0 [0] 
+        <a href="simdimg/unpack.php@f=punpckhwd.htm" target="_blank" class="IL">punpckhwd</a>  xmm2, xmm3     ; upper 4 DWORDS:  0 [7] 0 [6] 0 [5] 0 [4]
+</pre>
+    </div>
+    <p>Example: Sign extend 16 BYTES in XMM1 to WORDS in XMM1 (lower 8) and XMM2 (upper 8).</p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+        <a href="simdimg/binop.php@f=pxor.htm" target="_blank" class="IL">pxor</a>       xmm3, xmm3
+        movdqa     xmm2, xmm1
+        <a href="simdimg/pcmp.php@f=pcmpgtb.htm" target="_blank" class="IL">pcmpgtb</a>    xmm3, xmm1     ; upper 8-bit to attach to each BYTE = src >= 0 ? 0 : -1
+        <a href="simdimg/unpack.php@f=punpcklbw.htm" target="_blank" class="IL">punpcklbw</a>  xmm1, xmm3     ; lower 8 WORDS
+        <a href="simdimg/unpack.php@f=punpckhbw.htm" target="_blank" class="IL">punpckhbw</a>  xmm2, xmm3     ; upper 8 WORDS
+</pre>
+    </div>
+    <p>
+        Example (intrinsics):
+        Sign extend 8 WORDS in __m128i variable words8 to DWORDS in dwords4lo (lower 4) and dwords4hi (upper 4)
+    </p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+    const __m128i izero = _mm_setzero_si128();
+    __m128i words8hi = <a href="simdimg/pcmp.php@f=pcmpgtw.htm" target="_blank" class="IL">_mm_cmpgt_epi16</a>(izero, words8);
+    __m128i dwords4lo = <a href="simdimg/unpack.php@f=punpcklwd.htm" target="_blank" class="IL">_mm_unpacklo_epi16</a>(words8, words8hi);
+    __m128i dwords4hi = <a href="simdimg/unpack.php@f=punpckhwd.htm" target="_blank" class="IL">_mm_unpackhi_epi16</a>(words8, words8hi);
+</pre>
+    </div>
+    <p>&nbsp;</p>
+    <h2 id="tip4">TIP 4: Absolute Values of Integers</h2>
+    <p>If an integer value is positive or zero, it is already the abosoute value. Else, adding 1 after complementing all bits makes the absolute value.</p>
+    <p>Example: Set absolute values of 8 signed WORDS in XMM1 to XMM1</p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+                                  ; if src is positive or 0; if src is negative
+        <a href="simdimg/binop.php@f=pxor.htm" target="_blank" class="IL">pxor</a>      xmm2, xmm2      
+        <a href="simdimg/pcmp.php@f=pcmpgtw.htm" target="_blank" class="IL">pcmpgtw</a>   xmm2, xmm1      ; xmm2 &lt;- 0              ; xmm2 &lt;- 1
+        <a href="simdimg/binop.php@f=pxor.htm" target="_blank" class="IL">pxor</a>      xmm1, xmm2      ; xor with 0(do nothing) ; xor with -1(complement all bits)
+        <a href="simdimg/binop.php@f=psubw.htm" target="_blank" class="IL">psubw</a>     xmm1, xmm2      ; subtract 0(do nothing) ; subtract -1(add 1)
+</pre>
+    </div>
+
+    <p>Example (intrinsics): Set abosolute values of 4 DWORDS in __m128i variable dwords4 to dwords4</p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+    const __m128i izero = _mm_setzero_si128();
+    __m128i tmp = <a href="simdimg/pcmp.php@f=pcmpgtd.htm" target="_blank" class="IL">_mm_cmpgt_epi32</a>(izero, dwords4);
+    dwords4 = <a href="simdimg/binop.php@f=pxor.htm" target="_blank" class="IL">_mm_xor_si128</a>(dwords4, tmp);
+    dwords4 = <a href="simdimg/binop.php@f=psubd.htm" target="_blank" class="IL">_mm_sub_epi32</a>(dwords4, tmp);
+</pre>
+    </div>
+
+    <p>&nbsp;</p>
+    <h2 id="tip5">TIPS 5: Absolute Values of Floating-Points</h2>
+    <p>Floating-Points are not complemented so just clearing sign (the highest) bit makes the absolute value.</p>
+    <p>Example: Set absolute values of 4 floats in XMM1 to XMM1</p>
+
+    <div class="srcprogdiv">
+<pre class="srcprog">
+; data
+              align   16
+signoffmask   dd      4 dup (7fffffffH)       ; mask for clearing the highest bit
+        
+; code
+        <a href="simdimg/binop.php@f=andps.htm" target="_blank" class="IL">andps</a>   xmm1, xmmword ptr signoffmask        
+</pre>
+    </div>
+
+    <p>Example (intrinsics): Set absolute values of 4 floats in __m128 variable floats4 to floats4</p>
+
+    <div class="srcprogdiv">
+<pre class="srcprog">
+        const __m128 signmask = _mm_set1_ps(-0.0f); // 0x80000000
+
+        floats4 = <a href="simdimg/binop.php@f=andnps.htm" target="_blank" class="IL">_mm_andnot_ps</a>(signmask, floats4);</pre>
+    </div>
+
+    <p>&nbsp;</p>
+    <h2>TIP 6: Lacking some integer MUL instructions?</h2>
+    <p>Signed/unsigned makes difference only for the calculation of the upper part. Fot the lower part, the same instruction can be used both for signed and unsigned.</p>
+    <p>unsigned WORD * unsigned WORD -&gt; Upper WORD: PMULHUW, Lower WORD: PMULLW</p>
+    <p>singed WORD * signed WORD -&gt; Upper WORD: PMULHW, Lower WORD: PMULLW</p>
+    <p>&nbsp;</p>
+    <h2 id="tip8">TIP 8: max / min</h2>
+    <p>Bitwise operation after getting mask by compararison does.</p>
+    <p>Example: Compare each signed DWORD in XMM1 and XMM2 and set smaller one to XMM1</p>
+
+    <div class="srcprogdiv">
+<pre class="srcprog">
+; A=xmm1  B=xmm2                    ; if A&gt;B        ; if A&lt;=B
+        movdqa      xmm0, xmm1
+        <a href="simdimg/pcmp.php@f=pcmpgtd.htm" target="_blank" class="IL">pcmpgtd</a>     xmm1, xmm2      ; xmm1=-1       ; xmm1=0
+        <a href="simdimg/binop.php@f=pand.htm" target="_blank" class="IL">pand</a>        xmm2, xmm1      ; xmm2=B        ; xmm2=0
+        <a href="simdimg/binop.php@f=pandn.htm" target="_blank" class="IL">pandn</a>       xmm1, xmm0      ; xmm1=0        ; xmm1=A
+        <a href="simdimg/binop.php@f=por.htm" target="_blank" class="IL">por</a>         xmm1, xmm2      ; xmm1=B        ; xmm1=A
+</pre>
+    </div>
+
+    <p>Example (intrinsics): Compare each signed byte in __m128i variables a, b and set larger one to maxAB</p>
+
+    <div class="srcprogdiv">
+<pre class="srcprog">
+    __m128i mask = <a href="simdimg/pcmp.php@f=pcmpgtb.htm" target="_blank" class="IL">_mm_cmpgt_epi8</a>(a, b);
+    __m128i selectedA = <a href="simdimg/binop.php@f=pand.htm" target="_blank" class="IL">_mm_and_si128</a>(mask, a);
+    __m128i selectedB = <a href="simdimg/binop.php@f=pandn.htm" target="_blank" class="IL">_mm_andnot_si128</a>(mask, b);
+    __m128i maxAB = <a href="simdimg/binop.php@f=por.htm" target="_blank" class="IL">_mm_or_si128</a>(selectedA, selectedB);
+</pre>
+    </div>
+
+    <p>&nbsp;</p>
+    <h2>TIP 10: Set all bits</h2>
+    <p>PCMPEQx instruction does.</p>
+    <p>Example: set -1 to all of the 2 QWORDS / 4 DWORDS / 8 WORDS / 16 BYTES in XMM1.</p>
+    <div class="srcprogdiv">
+<pre class="srcprog">
+        <a href="simdimg/pcmp.php@f=pcmpeqb.htm" target="_blank" class="IL">pcmpeqb</a>         xmm1, xmm1</pre>
+    </div>
+
+
+
+    <p>&nbsp;</p>
+    <hr />
+    ver 2019101400<br />
+    <script type="text/javascript" src="../../https@www.officedaytime.com\tips\simdfeedback\alog.js"></script>
+    <script type="text/javascript">alog("alles");</script>
+
+</body>
+
+</html>

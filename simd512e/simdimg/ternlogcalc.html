@@ -1,0 +1,400 @@
+<!doctype html><HTML>
+<!-- saved from url=(0063)https://www.officedaytime.com/simd512e/simdimg/ternlogcalc.html --><meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <link rel="alternate" hreflang="ja" href="../../simd512/simdimg/ternlogcalc.html" />
+    <link rel="alternate" hreflang="en" href="ternlogcalc.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0" />
+    <title>VPTERNLOGx imm8 Calculator</title>
+    <style>
+        .red {
+            color: #FF0000;
+        }
+
+        h1 {
+            font-size: 15pt;
+            font-weight: bold;
+            background-color: #8288FD;
+            color: #FFFFFF;
+            padding: 2pt;
+        }
+
+        body {
+            font-family: sans-serif;
+            font-size: 10.5pt;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        h2 {
+            font-weight: bold;
+            padding: 2pt 2pt 0pt 0pt;
+            font-size: 10pt;
+            border-bottom-style: solid;
+            border-bottom-width: 2px;
+            border-bottom-color: #0000FF;
+        }
+
+        h3 {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #0000FF;
+        }
+
+        dt {
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #FFFFFF;
+        }
+
+        table {
+            background-color: #C0C0C0;
+        }
+
+        th {
+            background-color: #E0E0E0;
+        }
+
+        .srcprogdiv {
+            border: 1px solid #0000FF;
+            border-radius: 5px;
+            padding: 5px 10px 5px 10px;
+        }
+
+        .intr {
+            color: #6778ED;
+        }
+
+        .IL {
+            color: black;
+        }
+
+        .operand {
+            font-style: italic;
+        }
+
+        .cppcmnt {
+            color: #00A000;
+        }
+
+        .exp {
+            font-family: sans-serif, monospace;
+        }
+    </style>
+
+    <script>
+
+/*
+operator precedence
+function() ()
+~       right to left
+&
+^
+|
+? :     right to left
+*/
+var s_error = "error ";
+var s_number_of_arguments = "# of arguments";
+
+var tokens;
+var nextToken;
+var hexchars = '0123456789ABCDEF';
+
+var constsandvars = {
+    '0': 0,
+    '1': 0xFF,
+    'a': 0xF0,
+    'b': 0xCC,
+    'c': 0xAA,
+};
+
+var operators = {
+    '&': { precedence: 2, fnc: function (x, y) { return x & y; } },
+    '^': { precedence: 1, fnc: function (x, y) { return x ^ y; } },
+    '|': { precedence: 0, fnc: function (x, y) { return x | y; } },
+};
+
+var functions = {
+    'major': function (args) { return bitwiseMajor(args); },
+    'minor': function (args) { return ~bitwiseMajor(args); },
+    'eq':    function (args) { return bitwiseEqual(args); },
+    'neq':   function (args) { return ~bitwiseEqual(args); },
+    'not':   function (args) { if (args.length != 1) throw s_number_of_arguments; return ~args[0]; },
+    'and':   function (args) { return calcArgs(args, operators['&']) },
+    'or':    function (args) { return calcArgs(args, operators['|']) },
+    'xor':   function (args) { return calcArgs(args, operators['^']) },
+    'nand':  function (args) { return ~calcArgs(args, operators['&']) },
+    'nor':   function (args) { return ~calcArgs(args, operators['|']) },
+    'xnor':  function (args) { return ~calcArgs(args, operators['^']) },
+};
+
+function calc()
+{
+    var resultelem = document.getElementById('result');
+    while (resultelem.lastChild)
+        resultelem.removeChild(resultelem.lastChild);
+
+    var exp1 = document.getElementById("exp").value;
+
+    // token parsing
+    tokens = exp1.match(/([0-9a-zA-Z_]+)|([^0-9a-zA-Z_\s])/g);
+    if (!tokens)
+        return;
+
+    nextToken = 0;
+
+    try {
+        var v = getValue();
+        checkToken('');
+
+        var elemResultsDiv = document.getElementById("resultsdiv");
+        elemResultsDiv.insertBefore(createTable(exp1, v), elemResultsDiv.firstChild);
+
+        var elem = document.createElement("p");
+        elem.appendChild(document.createTextNode(exp1));
+        elem.appendChild(document.createElement("br"));
+        elem.appendChild(document.createTextNode("imm8 = 0x" + hexchars.charAt((v >> 4) & 0xF) + hexchars.charAt(v & 0x0F)));
+        elemResultsDiv.insertBefore(elem, elemResultsDiv.firstChild);
+    }
+    catch (e) {
+        resultelem.appendChild(document.createTextNode(s_error + e.toString()));
+    }
+}
+
+function createTable(exp, value)
+{
+    var tbl = document.createElement("table");
+
+    tbl.appendChild(createRow("a", constsandvars["a"]));
+    tbl.appendChild(createRow("b", constsandvars["b"]));
+    tbl.appendChild(createRow("c", constsandvars["c"]));
+    tbl.appendChild(createRow(exp, value));
+    return tbl;
+}
+
+function createRow(exp, value)
+{
+    var row = document.createElement("tr");
+
+    var hdr = document.createElement("th");
+    hdr.appendChild(document.createTextNode(exp));
+    row.appendChild(hdr);
+
+    for (var i = 7; i >= 0; i--) {
+        var data = document.createElement("td");
+        data.appendChild(document.createTextNode((value & (1 << i)) ? "1" : "0"));
+        row.appendChild(data);
+    }
+    return row;
+}
+
+function defined(a) {
+    return a != undefined;
+}
+
+// get the value of polynomial
+function getValue() {
+    var vstack = [];
+    var ostack = [];
+
+    while (true) {
+        // get one term
+        vstack.push(getTerm());
+
+        // get operator
+        var operator = getToken();
+
+        if (defined(operators[operator])) {
+            var opobj = operators[operator];
+            while (!pushable(ostack, opobj))
+                operate(ostack, vstack);
+
+            ostack.push(opobj);
+        }
+        // ?: operator
+        else if (operator == '?') {
+            // reduce current stack
+            while (ostack.length > 0)
+                operate(ostack, vstack);
+
+            var condition = vstack[0];
+
+            // process up to :
+            var value1 = getValue();
+            checkToken(':');
+
+            // process up to end
+            var value2 = getValue();
+
+            // return the result
+            return (condition & value1) | (~condition & value2);
+        }
+        else {
+            // reduce current stack
+            while (ostack.length > 0)
+                operate(ostack, vstack);
+
+            // restore the token that finished this polynomial
+            ungetToken();
+
+            return vstack[0];
+        }
+    }
+}
+
+function pushable(ostack, opobj)
+{
+    // pushable if opobj precedes ostack top object
+    if (ostack.length == 0)
+        return true;
+
+    return (opobj.precedence > ostack[ostack.length - 1].precedence);
+}
+
+function operate(ostack, vstack)
+{
+    if (ostack.length == 0)
+        throw "internal error 2A";
+
+    if (ostack.length + 1 != vstack.length)
+        throw "internal error 2B";
+
+    var opobj = ostack.pop();
+    var v2 = vstack.pop();
+    var v1 = vstack.pop();
+
+    vstack.push(opobj.fnc(v1, v2));
+}
+
+
+// get the value of one term
+function getTerm() {
+    var token = getToken();
+
+    if (token == '(') {
+        var v = getValue();
+        checkToken(')');
+        return v;
+    }
+    else if (token == '~')
+        return ~getTerm();
+    else if (defined(constsandvars[token]))
+        return constsandvars[token];
+    else if (defined(functions[token])) {
+        var args = getArgs();
+        return functions[token](args);
+    }
+    else
+        throw token;
+}
+
+function getToken() {
+    if (nextToken >= 0 && nextToken < tokens.length)
+        return tokens[nextToken++];
+
+    nextToken++;
+    return '';
+}
+
+function ungetToken() {
+    nextToken--;
+}
+
+function checkToken(tokenExpected) {
+    var token = getToken();
+    if (token != tokenExpected)
+        throw token;
+}
+
+function getArgs() {
+    var token = getToken();
+    if (token != '(')
+        throw token;
+
+    var args = [];
+    token = getToken();
+    // get arguments if any
+    if (token != ')') {
+        ungetToken();
+        while (true) {
+            args.push(getValue());
+            token = getToken();
+            if (token == ')')
+                break;
+            if (token != ',')
+                throw token;
+        }
+    }
+    return args;
+}
+
+function bitwiseMajor(args)
+{
+    if (args.length != 3)
+        throw s_number_of_arguments;
+
+    var x = args[0];
+    var y = args[1];
+    var z = args[2];
+    return (x & y) | (y & z) | (z & x);
+}
+
+function bitwiseEqual(args)
+{
+    if (args.length != 2)
+        throw s_number_of_arguments;
+
+    var x = args[0];
+    var y = args[1];
+    return ~(x ^ y);
+}
+
+function calcArgs(args, opobj) {
+    if (args.length < 2)
+        throw s_number_of_arguments;
+
+    var x = args[0];
+    for (var i = 1; i < args.length; i++)
+        x = opobj.fnc(x, args[i]);
+
+    return x;
+}
+
+    </script>
+
+
+
+</head>
+<body>
+    <h2>VPTERNLOGx imm8 Calculator</h2>
+    <p>Enter a bitwise logical expression in C/C++ style, to find the value of imm8 for VPTERNLOGQ / VPTERNLOGD instruction.</p>
+    <p>Variables: a = operand 1,  b = operand 2, c = operand 3</p>
+    <p>Constants: 0, 1</p>
+    <p>Operators: () ~ &amp; ^ | ?: (order of precedence)</p>
+    <p>Functions: major(x, y, z), minor(x, y, z), eq(x, y), neq(x, y), and(x, y...), or(x, y...), xor(x, y...), nand(x, y...), nor(x, y...), xnor(x, y...), not(x)</p>
+    <p>major(x, y, z) returns 1 if two or three of the arguments are 1.  minor(x, y, z) returns 1 if none or one of the areguments is 1.</p>
+    <form onsubmit="calc(); return false;">
+        Exp
+        <input type="text" id="exp" class="exp" placeholder="~a &amp; (b ^ c)" style="max-width:600px; width:60%; font-size:16px;" />
+        <input type="submit" value="Go" />
+    </form>
+    <p id="result" class="red"></p>
+    <div id="resultsdiv"></div>
+
+    <hr />
+
+
+
+    <a href="../default.htm">x86/x64 SIMD Instruction List</a>&nbsp;
+    <a href="../../tips/simdfeedback/feedbackforme.php@src=ternlogcalc.htm" target="_blank">Feedback</a>
+    <br>
+    <script src="../../../https@www.officedaytime.com\tips\simdfeedback\alog.js"></script>
+    <script>alog("alles");</script>
+    <br />
+
+</body>
+</html>
